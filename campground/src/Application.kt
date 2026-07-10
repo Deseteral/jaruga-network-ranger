@@ -12,7 +12,6 @@ import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
 
 fun main(args: Array<String>) {
-    println("Hello campground!")
     embeddedServer(
         factory = io.ktor.server.netty.Netty,
         port = 8080,

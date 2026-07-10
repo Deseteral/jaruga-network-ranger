@@ -2,8 +2,11 @@ product: jvm/app
 
 settings:
   kotlin:
+    version: 2.4.0
     serialization: json
-  ktor: enabled
+  ktor:
+    enabled: true
+    version: 3.5.1
 
 dependencies:
   - $ktor.server.core
