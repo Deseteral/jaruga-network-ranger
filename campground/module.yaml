@@ -1,11 +1,18 @@
 product: jvm/app
 
 settings:
+  kotlin:
+    serialization: json
   ktor: enabled
 
 dependencies:
   - $ktor.server.core
   - $ktor.server.netty
+  - $ktor.server.contentNegotiation
+  - $ktor.serialization.kotlinx.json
+  - $ktor.client.cio
+  - $ktor.client.contentNegotiation
+  - io.github.oshai:kotlin-logging-jvm:8.0.4
   - ch.qos.logback:logback-classic:1.5.18
 
 test-dependencies:
