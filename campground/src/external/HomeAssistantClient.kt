@@ -14,15 +14,15 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import xyz.deseteral.jaruga.campground.configuration.Configuration
 import xyz.deseteral.jaruga.campground.domain.Hass
-import xyz.deseteral.jaruga.campground.domain.HomeAssistantConfiguration
 import xyz.deseteral.jaruga.campground.domain.HomeAssistantRepository
 import xyz.deseteral.jaruga.campground.domain.HomeAssistantState
 
 private val logger = KotlinLogging.logger {}
 
 class HomeAssistantClient(
-    private val config: HomeAssistantConfiguration,
+    private val config: Configuration.HomeAssistant,
 ) : HomeAssistantRepository {
     override suspend fun getHass(): Hass? {
         val states = getAllStates() ?: return null
