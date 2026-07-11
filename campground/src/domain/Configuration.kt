@@ -9,7 +9,7 @@ data class HomeAssistantConfiguration(
     val accessToken: String,
 )
 
-data class SystemHealthCheck(
+data class Healthcheck(
     val checks: List<Check>,
 )
 

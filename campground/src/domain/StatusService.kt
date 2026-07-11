@@ -15,7 +15,7 @@ class StatusService(
             hass = async { homeAssistantRepository?.getHass() }.await(),
         )
 
-        val checks = healthcheck.checks.map { check ->
+        healthcheck.checks.map { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
             CheckResult(
                 name = check.name,
@@ -25,9 +25,7 @@ class StatusService(
                     CheckState.SUCCESS
                 },
             )
-        }
-
-        Status(checks)
+        }.let { Status(it) }
     }
 }
 

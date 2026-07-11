@@ -9,7 +9,7 @@ interface HomeAssistantRepository {
 data class Hass(
     val states: List<HomeAssistantState>,
 ) {
-    val isUpdateAvailable: Boolean
+    val hasUpdatesAvailable: Boolean
         get() = states.any { it.entityId.startsWith("update.") && it.state == "on" }
 }
 
@@ -17,6 +17,6 @@ data class Hass(
 data class HomeAssistantState(
     val entityId: String,
     val state: String,
-    // val last_changed // TODO: Implement!
+    // val lastChanged // TODO: Implement!
     // val attributes // TODO: Implement!
 )
