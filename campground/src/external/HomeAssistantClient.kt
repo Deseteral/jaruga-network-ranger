@@ -1,17 +1,14 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package xyz.deseteral.jaruga.campground.external
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.get
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.expectSuccess
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import xyz.deseteral.jaruga.campground.configuration.Configuration
