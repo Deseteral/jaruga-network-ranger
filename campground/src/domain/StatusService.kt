@@ -3,29 +3,34 @@ package xyz.deseteral.jaruga.campground.domain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import xyz.deseteral.jaruga.campground.healthcheck
+import xyz.deseteral.jaruga.campground.checks
+import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
 
 private val logger = KotlinLogging.logger {}
 
 class StatusService(
     private val homeAssistantRepository: HomeAssistantRepository?,
 ) {
-    suspend fun getStatus(): Status = coroutineScope {
+    suspend fun getStatus(): SystemStatus = coroutineScope {
         val context = Context(
             hass = async { homeAssistantRepository?.getHass() }.await(),
         )
 
-        healthcheck.checks.map { check ->
+        checks.map { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
-            CheckResult(
+            SystemStatus.CheckResult(
                 name = check.name,
+                severity = when (check.severity(context)) {
+                    CheckDefinition.Severity.MAJOR -> SystemStatus.CheckResult.Severity.MAJOR
+                    CheckDefinition.Severity.MINOR -> SystemStatus.CheckResult.Severity.MINOR
+                },
                 state = if (check.isFailure(context) ?: true) {
-                    CheckState.FAILURE
+                    SystemStatus.CheckResult.State.FAILURE
                 } else {
-                    CheckState.SUCCESS
+                    SystemStatus.CheckResult.State.SUCCESS
                 },
             )
-        }.let { Status(it) }
+        }.let { SystemStatus(it) }
     }
 }
 
