@@ -22,7 +22,7 @@ import xyz.deseteral.jaruga.campground.domain.HomeAssistantState
 private val logger = KotlinLogging.logger {}
 
 class HomeAssistantClient(
-    private val config: Configuration.HomeAssistant,
+    private val config: Configuration.DataSource.HomeAssistant,
 ) : HomeAssistantRepository {
     override suspend fun getHass(): Hass? {
         val states = getAllStates() ?: return null

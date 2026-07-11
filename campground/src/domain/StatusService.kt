@@ -4,17 +4,29 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import xyz.deseteral.jaruga.campground.checks
+import xyz.deseteral.jaruga.campground.configuration
 import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
+import xyz.deseteral.jaruga.campground.configuration.Configuration
+import kotlin.collections.forEach
 
 private val logger = KotlinLogging.logger {}
 
 class StatusService(
-    private val homeAssistantRepository: HomeAssistantRepository?,
+    private val homeAssistantRepositoryProvider: HomeAssistantRepositoryProvider,
+    private val teslaMateRepositoryProvider: TeslaMateRepositoryProvider,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
-        val context = Context(
-            hass = async { homeAssistantRepository?.getHass() }.await(),
-        )
+        val context = Context()
+
+        configuration.sources.forEach { (name, dataSource) ->
+            when (dataSource) {
+                is Configuration.DataSource.HomeAssistant ->
+                    context.hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
+
+                is Configuration.DataSource.TeslaMate ->
+                    TODO()
+            }
+        }
 
         checks.map { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
@@ -34,6 +46,7 @@ class StatusService(
     }
 }
 
+// TODO: Change maps to be immutable.
 data class Context(
-    val hass: Hass? = null,
+    val hass: MutableMap<String, Hass?> = mutableMapOf(),
 )

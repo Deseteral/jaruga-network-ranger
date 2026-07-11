@@ -24,9 +24,10 @@ fun Application.module() {
         json()
     }
 
-    val homeAssistantClient = configuration.homeAssistant?.let { HomeAssistantClient(it) }
-
-    val statusService = StatusService(homeAssistantRepository = homeAssistantClient)
+    val statusService = StatusService(
+        homeAssistantRepositoryProvider = { dataSource -> HomeAssistantClient(dataSource) },
+        teslaMateRepositoryProvider = { dataSource -> TODO() }
+    )
 
     routing {
         get("/") {

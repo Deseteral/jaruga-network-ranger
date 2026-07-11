@@ -1,10 +1,13 @@
 package xyz.deseteral.jaruga.campground.domain
 
 import kotlinx.serialization.Serializable
+import xyz.deseteral.jaruga.campground.configuration.Configuration
 
 interface HomeAssistantRepository {
     suspend fun getHass(): Hass?
 }
+
+typealias HomeAssistantRepositoryProvider = (dataSource: Configuration.DataSource.HomeAssistant) -> HomeAssistantRepository
 
 data class Hass(
     val states: List<HomeAssistantState>,
