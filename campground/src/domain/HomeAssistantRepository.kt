@@ -1,6 +1,5 @@
 package xyz.deseteral.jaruga.campground.domain
 
-import kotlinx.serialization.Serializable
 import xyz.deseteral.jaruga.campground.configuration.Configuration
 
 interface HomeAssistantRepository {
@@ -16,7 +15,6 @@ data class Hass(
         get() = states.any { it.entityId.startsWith("update.") && it.state == "on" }
 }
 
-@Serializable
 data class HomeAssistantState(
     val entityId: String,
     val state: String,

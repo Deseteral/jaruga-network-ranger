@@ -10,6 +10,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
+import xyz.deseteral.jaruga.campground.external.TeslaMateClient
 
 fun main(args: Array<String>) {
     embeddedServer(
@@ -25,8 +26,8 @@ fun Application.module() {
     }
 
     val statusService = StatusService(
-        homeAssistantRepositoryProvider = { dataSource -> HomeAssistantClient(dataSource) },
-        teslaMateRepositoryProvider = { dataSource -> TODO() }
+        homeAssistantRepositoryProvider = { HomeAssistantClient(it) },
+        teslaMateRepositoryProvider = { TeslaMateClient(it) },
     )
 
     routing {

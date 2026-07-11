@@ -24,7 +24,7 @@ class StatusService(
                     context.hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
 
                 is Configuration.DataSource.TeslaMate ->
-                    TODO()
+                    context.teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
             }
         }
 
@@ -49,4 +49,5 @@ class StatusService(
 // TODO: Change maps to be immutable.
 data class Context(
     val hass: MutableMap<String, Hass?> = mutableMapOf(),
+    val teslaMate: MutableMap<String, TeslaMateState?> = mutableMapOf(),
 )
