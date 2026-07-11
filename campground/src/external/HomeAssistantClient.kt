@@ -5,7 +5,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
@@ -27,6 +26,7 @@ class HomeAssistantClient(
     }
 
     private val httpClient = HttpClient(CIO) {
+        expectSuccess = true
         install(ContentNegotiation) {
             json(
                 Json {
@@ -40,10 +40,7 @@ class HomeAssistantClient(
     private suspend fun getAllStates(): List<HomeAssistantState>? {
         return try {
             httpClient
-                .get("${config.instanceUrl}/api/states") {
-                    expectSuccess = true
-                    bearerAuth(config.accessToken)
-                }
+                .get("${config.instanceUrl}/api/states") { bearerAuth(config.accessToken) }
                 .body()
         } catch (ex: Exception) {
             logger.error(ex) { "Error while getting HomeAssistant states." }

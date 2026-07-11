@@ -12,7 +12,7 @@ import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.campground.external.TeslaMateClient
 
-fun main(args: Array<String>) {
+fun main() {
     embeddedServer(
         factory = io.ktor.server.netty.Netty,
         port = 8080,
