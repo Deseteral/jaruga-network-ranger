@@ -7,6 +7,7 @@ import xyz.deseteral.jaruga.campground.checks
 import xyz.deseteral.jaruga.campground.configuration
 import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
 import xyz.deseteral.jaruga.campground.configuration.Configuration
+import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 import kotlin.collections.forEach
 import kotlin.time.Clock
 

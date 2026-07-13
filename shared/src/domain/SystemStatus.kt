@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.campground.domain
+package xyz.deseteral.jaruga.network.ranger.domain
 
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant

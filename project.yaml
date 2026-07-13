@@ -1,3 +1,4 @@
 modules:
   - campground
   - lookout
+  - shared

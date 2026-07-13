@@ -10,6 +10,7 @@ settings:
     version: 3.5.1
 
 dependencies:
+  - ../shared
   - $ktor.server.core
   - $ktor.server.netty
   - $ktor.server.contentNegotiation
