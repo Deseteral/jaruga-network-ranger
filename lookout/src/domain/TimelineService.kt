@@ -1,7 +1,6 @@
 package xyz.deseteral.jaruga.lookout.domain
 
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
-import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.Severity.MAJOR
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.State.SUCCESS
 
@@ -12,10 +11,7 @@ class TimelineService(
         require(timelineSize > 1) { "timelineSize must be greater than 1." }
     }
 
-    private val checks: MutableMap<SystemStatus.CheckResult.CheckId, ArrayDeque<SystemStatus.CheckResult.State?>> =
-        mutableMapOf()
-
-    private val severity: MutableMap<SystemStatus.CheckResult.CheckId, SystemStatus.CheckResult.Severity> =
+    private val checks: MutableMap<SystemStatus.CheckResult.CheckId, ArrayDeque<SystemStatus.CheckResult?>> =
         mutableMapOf()
 
     fun insertLatest(systemStatusUpdate: SystemStatus?) {
@@ -30,12 +26,9 @@ class TimelineService(
         // When update contains new check - add it with unknown (null) values and process latest update state.
         systemStatusUpdate.checks.forEach { check ->
             checks.getOrPut(check.name) { emptyTimeline() }.let {
-                it.addFirst(check.state)
+                it.addFirst(check)
                 it.removeLast()
             }
-
-            // Update severity in case it changed.
-            severity[check.name] = check.severity
         }
 
         // When update does not contain checks that were previously known, set their latest state to unknown (null).
@@ -53,31 +46,31 @@ class TimelineService(
         // TODO: Find checks that are null only and remove them.
     }
 
-    fun findChecksThatFailedRecentUpdate(): Set<SystemStatus.CheckResult.CheckId> {
-        return checks.filter {
-            val (current, previous) = it.value
-            current == FAILURE && (previous == SUCCESS || previous == null)
-        }.map { it.key }.toSet()
+    fun allLatestInUnknownState(): Boolean {
+        return checks.values.all { it.first() == null }
     }
 
-    fun getSeverityByCheckName(name: SystemStatus.CheckResult.CheckId): SystemStatus.CheckResult.Severity {
-        return severity.getOrDefault(name, MAJOR)
+    fun findChecksThatFailedRecentUpdate(): List<SystemStatus.CheckResult> {
+        return checks.filter {
+            val (current, previous) = it.value
+            current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
+        }.mapNotNull { it.value.first() }
     }
 
     private fun insertLatestAllFailsForExistingChecks() {
         checks.values.forEach {
-            it.addFirst(FAILURE)
+            it.addFirst(null)
             it.removeLast()
         }
     }
 
-    private fun emptyTimeline(): ArrayDeque<SystemStatus.CheckResult.State?> =
+    private fun emptyTimeline(): ArrayDeque<SystemStatus.CheckResult?> =
         ArrayDeque(List(timelineSize) { null })
 
     // TODO: Remove.
     private fun debugPrint() {
         val statusToChar = { s: SystemStatus.CheckResult.State? ->
-            when(s) {
+            when (s) {
                 SUCCESS -> '1'
                 FAILURE -> '0'
                 null -> '.'
@@ -85,7 +78,7 @@ class TimelineService(
         }
 
         checks.forEach { (id, timeline) ->
-            println("${id.value.padEnd(50, ' ')} | ${timeline.map { statusToChar(it) }.joinToString("")}")
+            println("${id.value.padEnd(50, ' ')} | ${timeline.map { statusToChar(it?.state) }.joinToString("")}")
         }
     }
 }
