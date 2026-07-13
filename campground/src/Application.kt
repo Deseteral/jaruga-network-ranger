@@ -11,6 +11,7 @@ import io.ktor.server.routing.routing
 import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.campground.external.TeslaMateClient
+import kotlin.time.Clock
 
 fun main() {
     embeddedServer(
@@ -28,6 +29,7 @@ fun Application.module() {
     val statusService = StatusService(
         homeAssistantRepositoryProvider = { HomeAssistantClient(it) },
         teslaMateRepositoryProvider = { TeslaMateClient(it) },
+        Clock.System,
     )
 
     routing {

@@ -8,15 +8,19 @@ import xyz.deseteral.jaruga.campground.configuration
 import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
 import xyz.deseteral.jaruga.campground.configuration.Configuration
 import kotlin.collections.forEach
+import kotlin.time.Clock
 
 private val logger = KotlinLogging.logger {}
 
 class StatusService(
     private val homeAssistantRepositoryProvider: HomeAssistantRepositoryProvider,
     private val teslaMateRepositoryProvider: TeslaMateRepositoryProvider,
+    private val clock: Clock,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
         val context = Context()
+
+        val timestamp = clock.now()
 
         configuration.sources.forEach { (name, dataSource) ->
             when (dataSource) {
@@ -42,7 +46,7 @@ class StatusService(
                     SystemStatus.CheckResult.State.SUCCESS
                 },
             )
-        }.let { SystemStatus(it) }
+        }.let { checks -> SystemStatus(timestamp, checks) }
     }
 }
 

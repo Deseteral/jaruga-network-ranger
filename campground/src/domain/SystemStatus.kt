@@ -1,9 +1,11 @@
 package xyz.deseteral.jaruga.campground.domain
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class SystemStatus(
+    val timestamp: Instant,
     val checks: List<CheckResult>,
 ) {
 
