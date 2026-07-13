@@ -4,9 +4,15 @@ settings:
   ktor: enabled
 
 dependencies:
+  - ../shared
   - $ktor.server.core
   - $ktor.server.netty
+  - $ktor.server.contentNegotiation
+  - $ktor.serialization.kotlinx.json
+  - $ktor.client.cio
+  - $ktor.client.contentNegotiation
   - ch.qos.logback:logback-classic:1.5.18
+  - io.github.oshai:kotlin-logging-jvm:8.0.4
 
 test-dependencies:
   - $ktor.server.testHost
