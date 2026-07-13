@@ -7,6 +7,10 @@ import xyz.deseteral.jaruga.campground.checks
 import xyz.deseteral.jaruga.campground.configuration
 import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
 import xyz.deseteral.jaruga.campground.configuration.Configuration
+import xyz.deseteral.jaruga.campground.domain.datasources.Hass
+import xyz.deseteral.jaruga.campground.domain.datasources.HomeAssistantRepositoryProvider
+import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateRepositoryProvider
+import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateState
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 import kotlin.collections.forEach
 import kotlin.time.Clock
@@ -36,7 +40,7 @@ class StatusService(
         checks.map { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
             SystemStatus.CheckResult(
-                name = check.name,
+                name = SystemStatus.CheckResult.CheckId(check.name),
                 severity = when (check.severity(context)) {
                     CheckDefinition.Severity.MAJOR -> SystemStatus.CheckResult.Severity.MAJOR
                     CheckDefinition.Severity.MINOR -> SystemStatus.CheckResult.Severity.MINOR

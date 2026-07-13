@@ -11,10 +11,14 @@ data class SystemStatus(
 
     @Serializable
     data class CheckResult(
-        val name: String,
+        val name: CheckId,
         val state: State,
         val severity: Severity,
     ) {
+
+        @JvmInline
+        @Serializable
+        value class CheckId(val id: String)
 
         @Serializable
         enum class State {

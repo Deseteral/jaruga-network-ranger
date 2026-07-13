@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.campground.domain
+package xyz.deseteral.jaruga.campground.domain.datasources
 
 import kotlinx.serialization.Serializable
 import xyz.deseteral.jaruga.campground.configuration.Configuration

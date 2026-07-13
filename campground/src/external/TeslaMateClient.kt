@@ -12,8 +12,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import xyz.deseteral.jaruga.campground.configuration.Configuration
-import xyz.deseteral.jaruga.campground.domain.TeslaMateRepository
-import xyz.deseteral.jaruga.campground.domain.TeslaMateState
+import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateRepository
+import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateState
 
 private val logger = KotlinLogging.logger {}
 

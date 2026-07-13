@@ -11,9 +11,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import xyz.deseteral.jaruga.campground.configuration.Configuration
-import xyz.deseteral.jaruga.campground.domain.Hass
-import xyz.deseteral.jaruga.campground.domain.HomeAssistantRepository
-import xyz.deseteral.jaruga.campground.domain.HomeAssistantState
+import xyz.deseteral.jaruga.campground.domain.datasources.Hass
+import xyz.deseteral.jaruga.campground.domain.datasources.HomeAssistantRepository
+import xyz.deseteral.jaruga.campground.domain.datasources.HomeAssistantState
 
 private val logger = KotlinLogging.logger {}
 
