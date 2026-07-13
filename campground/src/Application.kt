@@ -33,7 +33,7 @@ fun Application.module() {
     )
 
     routing {
-        get("/") {
+        get("/system/status") {
             statusService.getStatus().let { call.respond(it) }
         }
     }

@@ -18,7 +18,7 @@ data class SystemStatus(
 
         @JvmInline
         @Serializable
-        value class CheckId(val id: String)
+        value class CheckId(val value: String)
 
         @Serializable
         enum class State {
