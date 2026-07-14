@@ -1,14 +1,19 @@
 package xyz.deseteral.jaruga.lookout
 
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
+import xyz.deseteral.jaruga.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.lookout.domain.ProbeService
 import xyz.deseteral.jaruga.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.lookout.external.CampgroundClient
+import xyz.deseteral.jaruga.lookout.external.DiscordClient
 
 fun main() {
     embeddedServer(
@@ -19,11 +24,18 @@ fun main() {
 }
 
 fun Application.module() {
+    install(ContentNegotiation) {
+        json()
+    }
+
     val campgroundClient = CampgroundClient(configuration.campground)
     val timelineService = TimelineService(configuration.bufferSize)
+    val discordClient = DiscordClient()
+    val notificationService = NotificationService(discordClient, configuration.notifier)
     val probeService = ProbeService(
         campgroundRepository = campgroundClient,
         timelineService = timelineService,
+        notificationService = notificationService,
     )
 
     launch {

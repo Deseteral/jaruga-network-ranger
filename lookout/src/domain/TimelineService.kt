@@ -46,15 +46,18 @@ class TimelineService(
         // TODO: Find checks that are null only and remove them.
     }
 
-    fun allLatestInUnknownState(): Boolean {
-        return checks.values.all { it.first() == null }
-    }
-
     fun findChecksThatFailedRecentUpdate(): List<SystemStatus.CheckResult> {
-        return checks.filter {
-            val (current, previous) = it.value
-            current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
-        }.mapNotNull { it.value.first() }
+        val allCurrentInUnknownState = checks.values.all { it[0] == null }
+        val allPreviousInUnknownState = checks.values.all { it[1] == null }
+
+        return if (allCurrentInUnknownState && !allPreviousInUnknownState) {
+            listOf(allChecksInUnknownStateCheckResult())
+        } else {
+            checks.filter {
+                val (current, previous) = it.value
+                current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
+            }.mapNotNull { it.value.first() }
+        }
     }
 
     private fun insertLatestAllFailsForExistingChecks() {
@@ -66,6 +69,13 @@ class TimelineService(
 
     private fun emptyTimeline(): ArrayDeque<SystemStatus.CheckResult?> =
         ArrayDeque(List(timelineSize) { null })
+
+    private fun allChecksInUnknownStateCheckResult(): SystemStatus.CheckResult =
+        SystemStatus.CheckResult(
+            SystemStatus.CheckResult.CheckId("All checks in unknown state"),
+            FAILURE,
+            SystemStatus.CheckResult.Severity.MAJOR,
+        )
 
     // TODO: Remove.
     private fun debugPrint() {
