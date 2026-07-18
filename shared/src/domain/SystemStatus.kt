@@ -12,6 +12,7 @@ data class SystemStatus(
     @Serializable
     data class CheckResult(
         val name: CheckId,
+        val description: String?,
         val state: State,
         val severity: Severity,
     ) {

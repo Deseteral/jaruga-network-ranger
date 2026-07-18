@@ -20,6 +20,7 @@ data class Configuration(
 // TODO: Add unique validation on name field.
 data class CheckDefinition(
     val name: String,
+    val description: ((ctx: Context) -> String)? = null,
     val severity: (ctx: Context) -> Severity,
     val isFailure: (ctx: Context) -> Boolean?,
 ) {

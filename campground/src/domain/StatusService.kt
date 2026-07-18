@@ -23,17 +23,17 @@ class StatusService(
     private val clock: Clock,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
-        val context = Context()
+        val ctx = Context()
 
         val timestamp = clock.now()
 
         configuration.sources.forEach { (name, dataSource) ->
             when (dataSource) {
                 is Configuration.DataSource.HomeAssistant ->
-                    context.hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
+                    ctx.hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
 
                 is Configuration.DataSource.TeslaMate ->
-                    context.teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
+                    ctx.teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
             }
         }
 
@@ -41,15 +41,16 @@ class StatusService(
             logger.info { "Evaluating check \"${check.name}\"." }
             SystemStatus.CheckResult(
                 name = SystemStatus.CheckResult.CheckId(check.name),
-                severity = when (check.severity(context)) {
+                severity = when (check.severity(ctx)) {
                     CheckDefinition.Severity.MAJOR -> SystemStatus.CheckResult.Severity.MAJOR
                     CheckDefinition.Severity.MINOR -> SystemStatus.CheckResult.Severity.MINOR
                 },
-                state = if (check.isFailure(context) ?: true) {
+                state = if (check.isFailure(ctx) ?: true) {
                     SystemStatus.CheckResult.State.FAILURE
                 } else {
                     SystemStatus.CheckResult.State.SUCCESS
                 },
+                description = check.description?.let { it(ctx) },
             )
         }.let { checks -> SystemStatus(timestamp, checks) }
     }

@@ -72,9 +72,10 @@ class TimelineService(
 
     private fun allChecksInUnknownStateCheckResult(): SystemStatus.CheckResult =
         SystemStatus.CheckResult(
-            SystemStatus.CheckResult.CheckId("All checks in unknown state"),
-            FAILURE,
-            SystemStatus.CheckResult.Severity.MAJOR,
+            name = SystemStatus.CheckResult.CheckId("All checks in unknown state"),
+            state = FAILURE,
+            severity = SystemStatus.CheckResult.Severity.MAJOR,
+            description = "Could not communicate with Campground instance."
         )
 
     // TODO: Remove.
