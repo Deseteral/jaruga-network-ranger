@@ -11,10 +11,7 @@ typealias HomeAssistantRepositoryProvider = (dataSource: Configuration.DataSourc
 
 data class Hass(
     val states: List<HomeAssistantState>,
-) {
-    val hasUpdatesAvailable: Boolean
-        get() = states.any { it.entityId.startsWith("update.") && it.state == "on" }
-}
+)
 
 @Serializable
 data class HomeAssistantState(
@@ -22,4 +19,7 @@ data class HomeAssistantState(
     val state: String,
     // val lastChanged // TODO: Implement!
     // val attributes // TODO: Implement!
-)
+) {
+    val canBeUpdated: Boolean
+        get() = entityId.startsWith("update.") && state == "on"
+}
