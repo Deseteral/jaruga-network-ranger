@@ -11,6 +11,8 @@ import xyz.deseteral.jaruga.campground.domain.datasources.Hass
 import xyz.deseteral.jaruga.campground.domain.datasources.HomeAssistantRepositoryProvider
 import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateRepositoryProvider
 import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateState
+import xyz.deseteral.jaruga.network.ranger.domain.CheckId
+import xyz.deseteral.jaruga.network.ranger.domain.CheckResult
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 import kotlin.collections.forEach
 import kotlin.time.Clock
@@ -39,15 +41,15 @@ class StatusService(
 
         checks.associate { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
-            SystemStatus.CheckResult.CheckId(check.name) to SystemStatus.CheckResult(
+            CheckId(check.name) to CheckResult(
                 severity = when (check.severity(ctx)) {
-                    CheckDefinition.Severity.MAJOR -> SystemStatus.CheckResult.Severity.MAJOR
-                    CheckDefinition.Severity.MINOR -> SystemStatus.CheckResult.Severity.MINOR
+                    CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
+                    CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
                 },
                 state = if (check.isFailure(ctx) ?: true) {
-                    SystemStatus.CheckResult.State.FAILURE
+                    CheckResult.State.FAILURE
                 } else {
-                    SystemStatus.CheckResult.State.SUCCESS
+                    CheckResult.State.SUCCESS
                 },
                 description = check.description?.let { it(ctx) },
                 timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
