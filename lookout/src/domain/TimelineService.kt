@@ -20,7 +20,11 @@ class TimelineService(
      */
     private val checks: MutableMap<SystemStatus.CheckResult.CheckId, Timeline> = mutableMapOf()
 
+    private var ticks = 0
+
     fun insertLatest(systemStatusUpdate: SystemStatus?) {
+        ticks += 1
+
         // systemStatus is null when we could not connect to Campground.
         // When that happens all existing known checks should be failed.
         if (systemStatusUpdate == null) {
@@ -44,15 +48,13 @@ class TimelineService(
 
         // TODO: Remove.
         debugPrint()
-
-        // TODO: Find checks that are null only and remove them.
     }
 
-    fun findChecksThatFailedRecentUpdate(): List<SystemStatus.CheckResult> {
+    fun findChecksThatFailedDuringRecentTick(): List<SystemStatus.CheckResult> {
         val allCurrentInUnknownState = checks.values.all { it[0] == null }
         val allPreviousInUnknownState = checks.values.all { it[1] == null }
 
-        return if (allCurrentInUnknownState && !allPreviousInUnknownState) {
+        return if (allCurrentInUnknownState && (!allPreviousInUnknownState || ticks == 1)) {
             listOf(allChecksInUnknownStateCheckResult())
         } else {
             checks.filter {

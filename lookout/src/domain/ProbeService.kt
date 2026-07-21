@@ -8,7 +8,7 @@ class ProbeService(
     suspend fun startProbing() {
         campgroundRepository.getSystemStatusUpdates().collect { systemStatusUpdates ->
             timelineService.insertLatest(systemStatusUpdates)
-            timelineService.findChecksThatFailedRecentUpdate().forEach { failedCheck ->
+            timelineService.findChecksThatFailedDuringRecentTick().forEach { failedCheck ->
                 notificationService.sendNotification(failedCheck)
             }
         }
