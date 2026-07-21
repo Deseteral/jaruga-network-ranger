@@ -8,6 +8,7 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import xyz.deseteral.jaruga.campground.api.systemStatusEndpoint
 import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.campground.external.TeslaMateClient
@@ -33,8 +34,6 @@ fun Application.module() {
     )
 
     routing {
-        get("/system/status") {
-            statusService.getStatus().let { call.respond(it) }
-        }
+        systemStatusEndpoint(statusService)
     }
 }
