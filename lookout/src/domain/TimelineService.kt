@@ -7,12 +7,18 @@ import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.State
 class TimelineService(
     private val timelineSize: Int,
 ) {
+    private typealias Timeline = ArrayDeque<SystemStatus.CheckResult?>
+
     init {
         require(timelineSize > 1) { "timelineSize must be greater than 1." }
     }
 
-    private val checks: MutableMap<SystemStatus.CheckResult.CheckId, ArrayDeque<SystemStatus.CheckResult?>> =
-        mutableMapOf()
+    /**
+     * Keeps state of checks.
+     * If each check is a row, then each column represents a point in time. Front of the queue is most recent.
+     * Each row is a circular buffer of size `timelineSize`.
+     */
+    private val checks: MutableMap<SystemStatus.CheckResult.CheckId, Timeline> = mutableMapOf()
 
     fun insertLatest(systemStatusUpdate: SystemStatus?) {
         // systemStatus is null when we could not connect to Campground.
@@ -25,19 +31,15 @@ class TimelineService(
         // Process all checks in update.
         // When update contains new check - add it with unknown (null) values and process latest update state.
         systemStatusUpdate.checks.forEach { check ->
-            checks.getOrPut(check.name) { emptyTimeline() }.let {
-                it.addFirst(check)
-                it.removeLast()
-            }
+            checks.getOrPut(check.name) { emptyTimeline() }
+                .insertLatestCheck(check)
         }
 
         // When update does not contain checks that were previously known, set their latest state to unknown (null).
         val missingInUpdate = checks.keys.toSet().minus(systemStatusUpdate.checks.map { it.name }.toSet())
         missingInUpdate.forEach { checkId ->
-            checks.getOrPut(checkId) { emptyTimeline() }.let {
-                it.addFirst(null)
-                it.removeLast()
-            }
+            checks.getOrPut(checkId) { emptyTimeline() }
+                .insertLatestCheck(null)
         }
 
         // TODO: Remove.
@@ -60,14 +62,10 @@ class TimelineService(
         }
     }
 
-    private fun insertLatestAllFailsForExistingChecks() {
-        checks.values.forEach {
-            it.addFirst(null)
-            it.removeLast()
-        }
-    }
+    private fun insertLatestAllFailsForExistingChecks() =
+        checks.values.forEach { it.insertLatestCheck(null) }
 
-    private fun emptyTimeline(): ArrayDeque<SystemStatus.CheckResult?> =
+    private fun emptyTimeline(): Timeline =
         ArrayDeque(List(timelineSize) { null })
 
     private fun allChecksInUnknownStateCheckResult(): SystemStatus.CheckResult =
@@ -91,5 +89,10 @@ class TimelineService(
         checks.forEach { (id, timeline) ->
             println("${id.value.padEnd(50, ' ')} | ${timeline.map { statusToChar(it?.state) }.joinToString("")}")
         }
+    }
+
+    private fun Timeline.insertLatestCheck(check: SystemStatus.CheckResult?) {
+        removeLast()
+        addFirst(check)
     }
 }

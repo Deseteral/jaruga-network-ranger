@@ -42,6 +42,7 @@ class TeslaMateClient(
         }
     }
 
+    // TODO: Cache this to get around rate limiting.
     private suspend fun getLatestVersion(): String? {
         return try {
             githubApiClient
