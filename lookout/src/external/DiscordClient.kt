@@ -16,10 +16,11 @@ import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 
 class DiscordClient: DiscordRepository {
     override suspend fun notifyViaWebhook(
+        checkId: SystemStatus.CheckResult.CheckId,
         check: SystemStatus.CheckResult,
         webhook: Configuration.NotificationChannel.DiscordWebhook,
     ) {
-        val content = check.name.value
+        val content = checkId.value
 
         httpClient.post(webhook.url) {
             contentType(ContentType.Application.Json)

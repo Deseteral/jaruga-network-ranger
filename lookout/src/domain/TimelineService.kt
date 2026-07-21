@@ -3,9 +3,11 @@ package xyz.deseteral.jaruga.lookout.domain
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus.CheckResult.State.SUCCESS
+import kotlin.time.Clock
 
 class TimelineService(
     private val timelineSize: Int,
+    private val clock: Clock,
 ) {
     private typealias Timeline = ArrayDeque<SystemStatus.CheckResult?>
 
@@ -34,13 +36,13 @@ class TimelineService(
 
         // Process all checks in update.
         // When update contains new check - add it with unknown (null) values and process latest update state.
-        systemStatusUpdate.checks.forEach { check ->
-            checks.getOrPut(check.name) { emptyTimeline() }
+        systemStatusUpdate.checks.forEach { (checkId, check) ->
+            checks.getOrPut(checkId) { emptyTimeline() }
                 .insertLatestCheck(check)
         }
 
         // When update does not contain checks that were previously known, set their latest state to unknown (null).
-        val missingInUpdate = checks.keys.toSet().minus(systemStatusUpdate.checks.map { it.name }.toSet())
+        val missingInUpdate = checks.keys.toSet().minus(systemStatusUpdate.checks.keys.toSet())
         missingInUpdate.forEach { checkId ->
             checks.getOrPut(checkId) { emptyTimeline() }
                 .insertLatestCheck(null)
@@ -50,17 +52,20 @@ class TimelineService(
         debugPrint()
     }
 
-    fun findChecksThatFailedDuringRecentTick(): List<SystemStatus.CheckResult> {
+    fun findChecksThatFailedDuringRecentTick(): Map<SystemStatus.CheckResult.CheckId, SystemStatus.CheckResult> {
         val allCurrentInUnknownState = checks.values.all { it[0] == null }
         val allPreviousInUnknownState = checks.values.all { it[1] == null }
 
         return if (allCurrentInUnknownState && (!allPreviousInUnknownState || ticks == 1)) {
-            listOf(allChecksInUnknownStateCheckResult())
+            allChecksInUnknownStateCheckResult()
         } else {
-            checks.filter {
-                val (current, previous) = it.value
-                current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
-            }.mapNotNull { it.value.first() }
+            checks
+                .filter { (_, timeline) ->
+                    val (current, previous) = timeline
+                    current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
+                }
+                .map { (checkId, timeline) -> checkId to requireNotNull(timeline.first()) }
+                .associate { (checkId, check) -> checkId to check }
         }
     }
 
@@ -70,12 +75,14 @@ class TimelineService(
     private fun emptyTimeline(): Timeline =
         ArrayDeque(List(timelineSize) { null })
 
-    private fun allChecksInUnknownStateCheckResult(): SystemStatus.CheckResult =
-        SystemStatus.CheckResult(
-            name = SystemStatus.CheckResult.CheckId("All checks in unknown state"),
-            state = FAILURE,
-            severity = SystemStatus.CheckResult.Severity.MAJOR,
-            description = "Could not communicate with Campground instance."
+    private fun allChecksInUnknownStateCheckResult(): Map<SystemStatus.CheckResult.CheckId, SystemStatus.CheckResult> =
+        mapOf(
+            SystemStatus.CheckResult.CheckId("All checks in unknown state") to SystemStatus.CheckResult(
+                state = FAILURE,
+                severity = SystemStatus.CheckResult.Severity.MAJOR,
+                description = "Could not communicate with Campground instance.",
+                timestamp = clock.now(),
+            )
         )
 
     // TODO: Remove.

@@ -14,6 +14,7 @@ import xyz.deseteral.jaruga.lookout.domain.ProbeService
 import xyz.deseteral.jaruga.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.lookout.external.CampgroundClient
 import xyz.deseteral.jaruga.lookout.external.DiscordClient
+import kotlin.time.Clock
 
 fun main() {
     embeddedServer(
@@ -29,7 +30,7 @@ fun Application.module() {
     }
 
     val campgroundClient = CampgroundClient(configuration.campground)
-    val timelineService = TimelineService(configuration.bufferSize)
+    val timelineService = TimelineService(configuration.bufferSize, Clock.System)
     val discordClient = DiscordClient()
     val notificationService = NotificationService(discordClient, configuration.notifier)
     val probeService = ProbeService(
