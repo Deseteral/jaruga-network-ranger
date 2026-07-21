@@ -37,10 +37,9 @@ class StatusService(
             }
         }
 
-        checks.map { check ->
+        checks.associate { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
-            SystemStatus.CheckResult(
-                name = SystemStatus.CheckResult.CheckId(check.name),
+            SystemStatus.CheckResult.CheckId(check.name) to SystemStatus.CheckResult(
                 severity = when (check.severity(ctx)) {
                     CheckDefinition.Severity.MAJOR -> SystemStatus.CheckResult.Severity.MAJOR
                     CheckDefinition.Severity.MINOR -> SystemStatus.CheckResult.Severity.MINOR
@@ -51,8 +50,9 @@ class StatusService(
                     SystemStatus.CheckResult.State.SUCCESS
                 },
                 description = check.description?.let { it(ctx) },
+                timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
             )
-        }.let { checks -> SystemStatus(timestamp, checks) }
+        }.let { checks -> SystemStatus(checks) }
     }
 }
 

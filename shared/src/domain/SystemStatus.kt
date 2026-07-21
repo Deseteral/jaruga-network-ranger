@@ -5,16 +5,15 @@ import kotlin.time.Instant
 
 @Serializable
 data class SystemStatus(
-    val timestamp: Instant,
-    val checks: List<CheckResult>,
+    val checks: Map<CheckResult.CheckId, CheckResult>,
 ) {
 
     @Serializable
     data class CheckResult(
-        val name: CheckId,
         val description: String?,
         val state: State,
         val severity: Severity,
+        val timestamp: Instant,
     ) {
 
         @JvmInline
