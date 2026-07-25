@@ -13,15 +13,32 @@ data class Configuration(
 
         data class TeslaMate(
             val instanceUrl: String,
-        ): DataSource()
+        ) : DataSource()
     }
 }
 
 // TODO: Add unique validation on name field.
 data class CheckDefinition(
+    /**
+     * Unique name for a check, that is also its identifier.
+     */
     val name: String,
+
+    /**
+     * Description of a check and why it failed.
+     * May be empty (null).
+     */
     val description: ((ctx: Context) -> String)? = null,
+
+    /**
+     * Based on data used to decide this check's health, what is the severity of this check.
+     */
     val severity: (ctx: Context) -> Severity,
+
+    /**
+     * Should this check failed. Return false to make this check as healthy.
+     * Returning null will make this check fail.
+     */
     val isFailure: (ctx: Context) -> Boolean?,
 ) {
     enum class Severity {
