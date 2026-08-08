@@ -4,11 +4,16 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.URLBuilder
+import io.ktor.http.Url
+import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
+import io.ktor.http.parseUrl
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -38,8 +43,10 @@ class DiscordClient : DiscordRepository {
         embeds: List<DiscordWebhookRequestBody.Embed>,
         webhook: Configuration.NotificationChannel.DiscordWebhook,
     ): String {
-        // TODO: Better URL creation.
-        val url = "${webhook.url}?wait=true"
+        val url = URLBuilder(webhook.url).apply {
+            parameters.append("wait", "true")
+        }.toString()
+
         val response = httpClient.post(url) {
             contentType(ContentType.Application.Json)
             setBody(DiscordWebhookRequestBody(embeds))
@@ -53,7 +60,10 @@ class DiscordClient : DiscordRepository {
         embeds: List<DiscordWebhookRequestBody.Embed>,
         webhook: Configuration.NotificationChannel.DiscordWebhook,
     ) {
-        val url = "${webhook.url}/messages/$messageId"
+        val url = URLBuilder(webhook.url).apply {
+            appendPathSegments("messages", messageId)
+        }.toString()
+
         httpClient.patch(url) {
             contentType(ContentType.Application.Json)
             setBody(DiscordWebhookRequestBody(embeds))

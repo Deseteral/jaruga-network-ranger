@@ -19,6 +19,7 @@ data class Configuration(
 
     sealed class NotificationChannel {
         data class DiscordWebhook(
+            // TODO: Validate URL can parse and are correct.
             val url: String,
         ) : NotificationChannel()
     }
