@@ -63,16 +63,6 @@ class TimelineService(
         return generateTimelinesDiff()
     }
 
-    private fun Map<CheckId, Timeline>.queryForCheckIdsWhere(predicate: (current: CheckResult?, previous: CheckResult?) -> Boolean): Set<CheckId> {
-        return this
-            .filter { (_, timeline) ->
-                val (current, previous) = timeline
-                predicate(current, previous)
-            }
-            .map { (checkId, _) -> checkId }
-            .toSet()
-    }
-
     private fun generateTimelinesDiff(): TimelinesUpdateDiff =
         (checkTimelines + (ALL_CHECKS_UNKNOWN_STATE_ID to allChecksInUnknownStateTimeline)).let {
             TimelinesUpdateDiff(
@@ -84,6 +74,12 @@ class TimelineService(
                 },
             )
         }
+
+    private fun Map<CheckId, Timeline>.queryForCheckIdsWhere(predicate: (current: CheckResult?, previous: CheckResult?) -> Boolean): Set<CheckId> =
+        filter { (_, timeline) ->
+            val (current, previous) = timeline
+            predicate(current, previous)
+        }.map { (checkId, _) -> checkId }.toSet()
 
     private fun insertLatestAllFailsForExistingChecks() =
         checkTimelines.values.forEach { it.insertLatestCheck(null) }
