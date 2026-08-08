@@ -118,9 +118,8 @@ private data class DiscordWebhookRequestBody(
     }
 
     companion object {
-        // TODO: Fix colors.
-        const val COLOR_RED: Int = 0xB34141
-        const val COLOR_GREEN: Int = 0x69B341
+        const val COLOR_RED: Int = 0xB34141 // Flexoki red-400.
+        const val COLOR_GREEN: Int = 0x879A39 // Flexoki green-400.
     }
 }
 
