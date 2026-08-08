@@ -36,7 +36,6 @@ fun Application.module() {
     val probeService = ProbeService(
         campgroundRepository = campgroundClient,
         timelineService = timelineService,
-        notificationService = notificationService,
     )
 
     launch {
