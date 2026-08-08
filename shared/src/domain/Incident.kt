@@ -14,6 +14,9 @@ data class Incident(
     val description: String?,
     val history: List<HistoryEntry>,
 ) {
+    val isResolved: Boolean
+        get() = resolvedOn != null
+
     @JvmInline
     @Serializable
     value class Id(val value: Uuid = Uuid.random())
