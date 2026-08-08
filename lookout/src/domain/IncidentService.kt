@@ -5,19 +5,20 @@ import xyz.deseteral.jaruga.network.ranger.domain.Incident
 
 class IncidentService(
     private val timelineService: TimelineService,
+    private val notificationService: NotificationService,
 ) {
 
     private val activeIncidents: MutableMap<CheckId, Incident> = mutableMapOf()
     private val resolvedIncidents: MutableList<Incident> = mutableListOf()
 
-    fun processTimelineDiff(diff: TimelineService.TimelinesUpdateDiff) {
+    suspend fun processTimelineDiff(diff: TimelineService.TimelinesUpdateDiff) {
         for (checkId in diff.degraded) {
             // Make sure we're only processing new incidents.
             if (activeIncidents.containsKey(checkId)) continue
 
             val checkResult = timelineService.getCheckResult(checkId) ?: continue
 
-            activeIncidents[checkId] = Incident(
+            val incident = Incident(
                 checkId = checkId,
                 triggeredOn = checkResult.timestamp,
                 resolvedOn = null,
@@ -25,6 +26,9 @@ class IncidentService(
                 description = checkResult.description,
                 history = listOf(Incident.HistoryEntry(timestamp = checkResult.timestamp, state = checkResult.state)),
             )
+
+            activeIncidents[checkId] = incident
+            notificationService.sendNotification(incident)
         }
 
         for (checkId in diff.healed) {
@@ -39,6 +43,8 @@ class IncidentService(
 
             resolvedIncidents.add(resolvedIncident)
             activeIncidents.remove(checkId)
+
+            notificationService.sendNotification(resolvedIncident)
         }
     }
 }

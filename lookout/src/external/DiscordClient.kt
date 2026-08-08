@@ -12,16 +12,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import xyz.deseteral.jaruga.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.lookout.domain.DiscordRepository
-import xyz.deseteral.jaruga.network.ranger.domain.CheckId
-import xyz.deseteral.jaruga.network.ranger.domain.CheckResult
+import xyz.deseteral.jaruga.network.ranger.domain.Incident
 
 class DiscordClient: DiscordRepository {
-    override suspend fun notifyViaWebhook(
-        checkId: CheckId,
-        check: CheckResult,
-        webhook: Configuration.NotificationChannel.DiscordWebhook,
-    ) {
-        val content = checkId.value
+    override suspend fun notifyViaWebhook(incident: Incident, webhook: Configuration.NotificationChannel.DiscordWebhook) {
+        val content = incident.checkId.value
 
         httpClient.post(webhook.url) {
             contentType(ContentType.Application.Json)

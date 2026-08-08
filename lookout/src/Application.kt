@@ -9,6 +9,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
+import xyz.deseteral.jaruga.lookout.domain.IncidentService
 import xyz.deseteral.jaruga.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.lookout.domain.ProbeService
 import xyz.deseteral.jaruga.lookout.domain.TimelineService
@@ -33,9 +34,11 @@ fun Application.module() {
     val timelineService = TimelineService(configuration.bufferSize, Clock.System)
     val discordClient = DiscordClient()
     val notificationService = NotificationService(discordClient, configuration.notifier)
+    val incidentService = IncidentService(timelineService = timelineService, notificationService = notificationService)
     val probeService = ProbeService(
         campgroundRepository = campgroundClient,
         timelineService = timelineService,
+        incidentService = incidentService,
     )
 
     launch {

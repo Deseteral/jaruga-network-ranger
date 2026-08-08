@@ -1,6 +1,6 @@
 package xyz.deseteral.jaruga.lookout.configuration
 
-import xyz.deseteral.jaruga.network.ranger.domain.CheckResult
+import xyz.deseteral.jaruga.network.ranger.domain.Incident
 import kotlin.time.Duration
 
 data class Configuration(
@@ -14,7 +14,7 @@ data class Configuration(
     )
 
     data class Notifier(
-        val process: (check: CheckResult) -> NotificationChannel,
+        val process: (incident: Incident) -> NotificationChannel,
     )
 
     sealed class NotificationChannel {
