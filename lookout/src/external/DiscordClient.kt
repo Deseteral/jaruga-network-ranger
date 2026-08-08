@@ -4,22 +4,26 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.URLBuilder
-import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
-import io.ktor.http.parseUrl
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import xyz.deseteral.jaruga.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.lookout.domain.DiscordRepository
 import xyz.deseteral.jaruga.network.ranger.domain.Incident
+import kotlin.time.Instant
 
 class DiscordClient : DiscordRepository {
     private val messageIds: MutableMap<Incident.Id, String> = mutableMapOf()
@@ -82,10 +86,9 @@ class DiscordClient : DiscordRepository {
 }
 
 private fun Incident.toDiscordEmbed(): DiscordWebhookRequestBody.Embed {
-    // TODO: Date formatting.
     val footerText = buildString {
-        append("Triggered on $triggeredOn")
-        resolvedOn?.let { append(", resolved on $it") }
+        append("Triggered on ${triggeredOn.format()}")
+        resolvedOn?.let { append(", resolved on ${it.format()}") }
         append(".")
     }
 
@@ -125,3 +128,21 @@ private data class DiscordWebhookRequestBody(
 private data class DiscordWebhookResponseBody(
     val id: String,
 )
+
+private val dateTimeFormat = LocalDateTime.Format {
+    year()
+    char('-')
+    monthNumber(Padding.ZERO)
+    char('-')
+    day(Padding.ZERO)
+
+    char(' ')
+
+    hour(Padding.ZERO)
+    char(':')
+    minute(Padding.ZERO)
+    char(':')
+    second(Padding.ZERO)
+}
+
+private fun Instant.format() = toLocalDateTime(TimeZone.currentSystemDefault()).format(dateTimeFormat)
