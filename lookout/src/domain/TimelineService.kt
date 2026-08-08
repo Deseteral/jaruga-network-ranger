@@ -94,11 +94,12 @@ class TimelineService(
     private fun emptyTimeline(): Timeline =
         ArrayDeque(List(timelineSize) { null })
 
+    // TODO: Extract along with corresponding ID.
     private fun allChecksInUnknownStateResult(state: CheckResult.State) = CheckResult(
         state = state,
         severity = CheckResult.Severity.MAJOR,
         timestamp = clock.now(),
-        description = null,
+        description = "Could not acquire system status update. All checks are in unknown state. Check Campground instance.",
     )
 
     // TODO: Remove.
