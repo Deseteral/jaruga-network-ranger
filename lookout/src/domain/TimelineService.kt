@@ -115,6 +115,7 @@ class TimelineService(
         allChecks.forEach { (id, timeline) ->
             println("${id.value.padEnd(50, ' ')} | ${timeline.map { statusToChar(it?.state) }.joinToString("")}")
         }
+        println("")
     }
 
     /**
