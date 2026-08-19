@@ -6,9 +6,10 @@ import xyz.deseteral.jaruga.network.ranger.domain.Incident
 class IncidentService(
     private val timelineService: TimelineService,
     private val notificationService: NotificationService,
+    private val activeIncidentsCache: PersistentCache<MutableMap<CheckId, Incident>>,
 ) {
 
-    private val activeIncidents: MutableMap<CheckId, Incident> = mutableMapOf()
+    private val activeIncidents: MutableMap<CheckId, Incident> = activeIncidentsCache.read { mutableMapOf() }
     private val resolvedIncidents: MutableList<Incident> = mutableListOf()
 
     suspend fun processTimelineDiff(diff: TimelineService.TimelinesUpdateDiff) {
@@ -46,5 +47,7 @@ class IncidentService(
 
             notificationService.sendNotification(resolvedIncident)
         }
+
+        activeIncidentsCache.write(activeIncidents)
     }
 }
