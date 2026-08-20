@@ -4,6 +4,7 @@ import xyz.deseteral.jaruga.campground.domain.Context
 
 data class Configuration(
     val sources: Map<String, DataSource>,
+    val checks: List<CheckDefinition>,
 ) {
     sealed class DataSource {
         data class HomeAssistant(

@@ -3,8 +3,6 @@ package xyz.deseteral.jaruga.campground.domain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import xyz.deseteral.jaruga.campground.checks
-import xyz.deseteral.jaruga.campground.configuration
 import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
 import xyz.deseteral.jaruga.campground.configuration.Configuration
 import xyz.deseteral.jaruga.campground.domain.datasources.Hass
@@ -23,6 +21,7 @@ class StatusService(
     private val homeAssistantRepositoryProvider: HomeAssistantRepositoryProvider,
     private val teslaMateRepositoryProvider: TeslaMateRepositoryProvider,
     private val clock: Clock,
+    private val configuration: Configuration,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
         val ctx = Context()
@@ -39,7 +38,7 @@ class StatusService(
             }
         }
 
-        checks.associate { check ->
+        configuration.checks.associate { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
             CheckId(check.name) to CheckResult(
                 severity = when (check.severity(ctx)) {

@@ -18,7 +18,6 @@ data class CheckResult(
     enum class State {
         SUCCESS,
         FAILURE,
-        ;
     }
 
     @Serializable

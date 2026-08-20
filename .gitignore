@@ -116,4 +116,5 @@ http-client.private.env.json
 
 build/
 
-UserConfiguration.kt
+active-incidents.json
+*.configuration.kts
