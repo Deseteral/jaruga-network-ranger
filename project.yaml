@@ -1,5 +1,4 @@
 modules:
   - campground
   - lookout
-  - shared
   - trail

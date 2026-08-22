@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.network.ranger.domain
+package xyz.deseteral.jaruga.ranger.trail.domain
 
 import kotlinx.serialization.Serializable
 

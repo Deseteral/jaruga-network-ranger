@@ -12,7 +12,7 @@ settings:
     version: 3.5.1
 
 dependencies:
-  - ../shared
+  - ../trail
   - $ktor.server.core
   - $ktor.server.netty
   - $ktor.server.contentNegotiation

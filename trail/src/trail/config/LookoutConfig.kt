@@ -1,9 +1,9 @@
-package xyz.deseteral.jaruga.ranger.lookout.configuration
+package xyz.deseteral.jaruga.ranger.trail.config
 
-import xyz.deseteral.jaruga.network.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 import kotlin.time.Duration
 
-data class Configuration(
+data class LookoutConfig(
     val campground: Campground,
     val bufferSize: Int,
     val notifier: Notifier,
