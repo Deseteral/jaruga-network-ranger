@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.configuration
+package xyz.deseteral.jaruga.ranger.lookout.configuration
 
 import xyz.deseteral.jaruga.network.ranger.domain.Incident
 import kotlin.time.Duration

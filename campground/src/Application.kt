@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.campground
+package xyz.deseteral.jaruga.ranger.campground
 
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -6,11 +6,11 @@ import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
-import xyz.deseteral.jaruga.campground.api.systemStatusEndpoint
-import xyz.deseteral.jaruga.campground.configuration.Configuration
-import xyz.deseteral.jaruga.campground.domain.StatusService
-import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
-import xyz.deseteral.jaruga.campground.external.TeslaMateClient
+import xyz.deseteral.jaruga.ranger.campground.api.systemStatusEndpoint
+import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
+import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
+import xyz.deseteral.jaruga.ranger.campground.external.TeslaMateClient
 import xyz.deseteral.jaruga.network.ranger.configuration.CampgroundConfigurationScript
 import xyz.deseteral.jaruga.network.ranger.configuration.loadUserConfiguration
 import java.io.File

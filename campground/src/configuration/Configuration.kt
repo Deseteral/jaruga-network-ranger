@@ -1,6 +1,6 @@
-package xyz.deseteral.jaruga.campground.configuration
+package xyz.deseteral.jaruga.ranger.campground.configuration
 
-import xyz.deseteral.jaruga.campground.domain.Context
+import xyz.deseteral.jaruga.ranger.campground.domain.Context
 
 data class Configuration(
     val sources: Map<String, DataSource>,

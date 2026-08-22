@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.external
+package xyz.deseteral.jaruga.ranger.lookout.external
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.Json
-import xyz.deseteral.jaruga.lookout.configuration.Configuration
-import xyz.deseteral.jaruga.lookout.domain.CampgroundRepository
+import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.lookout.domain.CampgroundRepository
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
 import kotlin.time.Duration
 

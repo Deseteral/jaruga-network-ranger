@@ -2,7 +2,7 @@ product: jvm/app
 
 settings:
   jvm:
-    mainClass: xyz.deseteral.jaruga.lookout.ApplicationKt
+    mainClass: xyz.deseteral.jaruga.ranger.lookout.ApplicationKt
   kotlin:
     version: 2.4.0
     serialization: json

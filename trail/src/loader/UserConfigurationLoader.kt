@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.network.ranger.trail.loader
+package xyz.deseteral.jaruga.ranger.trail.loader
 
 import java.io.File
 import kotlin.reflect.KClass
@@ -11,7 +11,7 @@ import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
-inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
+private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }
 
     val classLoader = Thread.currentThread().contextClassLoader

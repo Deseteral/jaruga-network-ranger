@@ -1,7 +1,7 @@
-package xyz.deseteral.jaruga.campground.domain.datasources
+package xyz.deseteral.jaruga.ranger.campground.domain.datasources
 
 import kotlinx.serialization.Serializable
-import xyz.deseteral.jaruga.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
 
 interface HomeAssistantRepository {
     suspend fun getHass(): Hass?

@@ -1,6 +1,6 @@
-package xyz.deseteral.jaruga.lookout.domain
+package xyz.deseteral.jaruga.ranger.lookout.domain
 
-import xyz.deseteral.jaruga.lookout.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.network.ranger.domain.Incident
 
 class NotificationService(

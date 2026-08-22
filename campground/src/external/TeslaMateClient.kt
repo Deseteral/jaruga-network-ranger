@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.campground.external
+package xyz.deseteral.jaruga.ranger.campground.external
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -11,9 +11,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
-import xyz.deseteral.jaruga.campground.configuration.Configuration
-import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateRepository
-import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateState
+import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateState
 
 private val logger = KotlinLogging.logger {}
 

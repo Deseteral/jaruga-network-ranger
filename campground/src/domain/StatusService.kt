@@ -1,14 +1,14 @@
-package xyz.deseteral.jaruga.campground.domain
+package xyz.deseteral.jaruga.ranger.campground.domain
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import xyz.deseteral.jaruga.campground.configuration.CheckDefinition
-import xyz.deseteral.jaruga.campground.configuration.Configuration
-import xyz.deseteral.jaruga.campground.domain.datasources.Hass
-import xyz.deseteral.jaruga.campground.domain.datasources.HomeAssistantRepositoryProvider
-import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateRepositoryProvider
-import xyz.deseteral.jaruga.campground.domain.datasources.TeslaMateState
+import xyz.deseteral.jaruga.ranger.campground.configuration.CheckDefinition
+import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.Hass
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepositoryProvider
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepositoryProvider
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateState
 import xyz.deseteral.jaruga.network.ranger.domain.CheckId
 import xyz.deseteral.jaruga.network.ranger.domain.CheckResult
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus

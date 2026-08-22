@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.external
+package xyz.deseteral.jaruga.ranger.lookout.external
 
 import kotlinx.io.buffered
 import kotlinx.io.files.FileSystem
@@ -8,7 +8,7 @@ import kotlinx.io.writeString
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import xyz.deseteral.jaruga.lookout.domain.PersistentCache
+import xyz.deseteral.jaruga.ranger.lookout.domain.PersistentCache
 
 class FilePersistentCache<T>(
     name: String,

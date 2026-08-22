@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.domain
+package xyz.deseteral.jaruga.ranger.lookout.domain
 
 import kotlinx.coroutines.flow.Flow
 import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus

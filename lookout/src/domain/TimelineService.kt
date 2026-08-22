@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.domain
+package xyz.deseteral.jaruga.ranger.lookout.domain
 
 import xyz.deseteral.jaruga.network.ranger.domain.CheckId
 import xyz.deseteral.jaruga.network.ranger.domain.CheckResult

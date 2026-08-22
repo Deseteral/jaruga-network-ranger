@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.lookout.external
+package xyz.deseteral.jaruga.ranger.lookout.external
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -20,8 +20,8 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import xyz.deseteral.jaruga.lookout.configuration.Configuration
-import xyz.deseteral.jaruga.lookout.domain.DiscordRepository
+import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.lookout.domain.DiscordRepository
 import xyz.deseteral.jaruga.network.ranger.domain.Incident
 import kotlin.time.Instant
 
