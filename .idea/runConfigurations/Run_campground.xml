@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run campground" type="Amper.Run">
+    <option name="command" value="run" />
+    <EXTENSION ID="amper.run.common">
+      <option name="module" value="campground" />
+    </EXTENSION>
+    <EXTENSION ID="amper.run.jvm">
+      <option name="mainClass" enabled="true" value="xyz.deseteral.jaruga.ranger.campground.ApplicationKt" />
+    </EXTENSION>
+    <method v="2" />
+  </configuration>
+</component>

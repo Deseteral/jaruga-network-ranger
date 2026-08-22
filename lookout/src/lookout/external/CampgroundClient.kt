@@ -14,15 +14,15 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.Json
-import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.lookout.domain.CampgroundRepository
-import xyz.deseteral.jaruga.ranger.domain.SystemStatus
+import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
 class CampgroundClient(
-    private val config: Configuration.Campground,
+    private val config: LookoutConfig.Campground,
 ) : CampgroundRepository {
     override suspend fun getSystemStatusUpdates(): Flow<SystemStatus?> {
         return ticker(config.interval).map { getSystemStatus() }

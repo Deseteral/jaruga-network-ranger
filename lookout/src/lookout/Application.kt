@@ -10,7 +10,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import kotlinx.io.files.SystemFileSystem
-import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.lookout.domain.IncidentService
 import xyz.deseteral.jaruga.ranger.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.ranger.lookout.domain.ProbeService
@@ -18,6 +17,7 @@ import xyz.deseteral.jaruga.ranger.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.ranger.lookout.external.CampgroundClient
 import xyz.deseteral.jaruga.ranger.lookout.external.DiscordClient
 import xyz.deseteral.jaruga.ranger.lookout.external.FilePersistentCache
+import xyz.deseteral.jaruga.ranger.trail.loader.loadLookoutConfig
 import java.io.File
 import kotlin.time.Clock
 
@@ -30,10 +30,7 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadUserConfiguration<Configuration, LookoutConfigurationScript>(
-        Configuration::class,
-        File("config.lookout.kts"),
-    )
+    val configuration = loadLookoutConfig(File("config.lookout.kts"))
 
     install(ContentNegotiation) {
         json()

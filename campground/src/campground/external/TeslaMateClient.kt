@@ -11,20 +11,20 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateState
+import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 
 private val logger = KotlinLogging.logger {}
 
 class TeslaMateClient(
-    private val config: Configuration.DataSource.TeslaMate,
+    private val config: CampgroundConfig.DataSource.TeslaMate,
 ) : TeslaMateRepository {
-    override suspend fun getState(): TeslaMateState? {
+    override suspend fun getState(): CampgroundContext.TeslaMate? {
         val instanceVersion = getInstanceVersion() ?: return null
         val latestVersion = getLatestVersion() ?: return null
 
-        return TeslaMateState(
+        return CampgroundContext.TeslaMate(
             isUpdateAvailable = instanceVersion != latestVersion,
         )
     }

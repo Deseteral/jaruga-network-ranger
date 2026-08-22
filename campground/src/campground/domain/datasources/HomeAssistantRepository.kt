@@ -1,25 +1,10 @@
 package xyz.deseteral.jaruga.ranger.campground.domain.datasources
 
-import kotlinx.serialization.Serializable
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 
 interface HomeAssistantRepository {
-    suspend fun getHass(): Hass?
+    suspend fun getHass(): CampgroundContext.Hass?
 }
 
-typealias HomeAssistantRepositoryProvider = (dataSource: Configuration.DataSource.HomeAssistant) -> HomeAssistantRepository
-
-data class Hass(
-    val states: List<HomeAssistantState>,
-)
-
-@Serializable
-data class HomeAssistantState(
-    val entityId: String,
-    val state: String,
-    // val lastChanged // TODO: Implement!
-    // val attributes // TODO: Implement!
-) {
-    val canBeUpdated: Boolean
-        get() = entityId.startsWith("update.") && state == "on"
-}
+typealias HomeAssistantRepositoryProvider = (dataSource: CampgroundConfig.DataSource.HomeAssistant) -> HomeAssistantRepository

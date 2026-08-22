@@ -8,21 +8,21 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.Hass
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepository
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantState
+import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 
 private val logger = KotlinLogging.logger {}
 
 class HomeAssistantClient(
-    private val config: Configuration.DataSource.HomeAssistant,
+    private val config: CampgroundConfig.DataSource.HomeAssistant,
 ) : HomeAssistantRepository {
-    override suspend fun getHass(): Hass? {
+    override suspend fun getHass(): CampgroundContext.Hass? {
         val states = getAllStates() ?: return null
-        return Hass(states)
+        return CampgroundContext.Hass(states.map { it.toDomain() })
     }
 
     private val httpClient = HttpClient(CIO) {
@@ -46,5 +46,13 @@ class HomeAssistantClient(
             logger.error(ex) { "Error while getting HomeAssistant states." }
             null
         }
+    }
+
+    @Serializable
+    private data class HomeAssistantState(
+        val entityId: String,
+        val state: String,
+    ) {
+        fun toDomain() = CampgroundContext.Hass.EntityState(entityId, state)
     }
 }

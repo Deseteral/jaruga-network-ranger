@@ -3,16 +3,13 @@ package xyz.deseteral.jaruga.ranger.campground.domain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import xyz.deseteral.jaruga.ranger.campground.configuration.CheckDefinition
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.Hass
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepositoryProvider
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepositoryProvider
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateState
-import xyz.deseteral.jaruga.ranger.domain.CheckId
-import xyz.deseteral.jaruga.ranger.domain.CheckResult
-import xyz.deseteral.jaruga.ranger.domain.SystemStatus
-import kotlin.collections.forEach
+import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Clock
 
 private val logger = KotlinLogging.logger {}
@@ -20,30 +17,33 @@ private val logger = KotlinLogging.logger {}
 class StatusService(
     private val homeAssistantRepositoryProvider: HomeAssistantRepositoryProvider,
     private val teslaMateRepositoryProvider: TeslaMateRepositoryProvider,
+    private val sources: Map<String, CampgroundConfig.DataSource>,
+    private val checks: List<CampgroundConfig.CheckDefinition>,
     private val clock: Clock,
-    private val configuration: Configuration,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
-        val ctx = Context()
-
         val timestamp = clock.now()
 
-        configuration.sources.forEach { (name, dataSource) ->
-            when (dataSource) {
-                is Configuration.DataSource.HomeAssistant ->
-                    ctx.hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
+        // Gather context.
+        val ctx = Context().apply {
+            sources.forEach { (name, dataSource) ->
+                when (dataSource) {
+                    is CampgroundConfig.DataSource.HomeAssistant ->
+                        hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
 
-                is Configuration.DataSource.TeslaMate ->
-                    ctx.teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
+                    is CampgroundConfig.DataSource.TeslaMate ->
+                        teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
+                }
             }
-        }
+        }.toDomain()
 
-        configuration.checks.associate { check ->
+        // Evaluate checks.
+        checks.associate { check ->
             logger.info { "Evaluating check \"${check.name}\"." }
             CheckId(check.name) to CheckResult(
                 severity = when (check.severity(ctx)) {
-                    CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
-                    CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
+                    CampgroundConfig.CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
+                    CampgroundConfig.CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
                 },
                 state = if (check.isFailure(ctx) ?: true) {
                     CheckResult.State.FAILURE
@@ -57,8 +57,9 @@ class StatusService(
     }
 }
 
-// TODO: Change maps to be immutable.
-data class Context(
-    val hass: MutableMap<String, Hass?> = mutableMapOf(),
-    val teslaMate: MutableMap<String, TeslaMateState?> = mutableMapOf(),
-)
+private data class Context(
+    val hass: MutableMap<String, CampgroundContext.Hass?> = mutableMapOf(),
+    val teslaMate: MutableMap<String, CampgroundContext.TeslaMate?> = mutableMapOf(),
+) {
+    fun toDomain() = CampgroundContext(hass, teslaMate)
+}

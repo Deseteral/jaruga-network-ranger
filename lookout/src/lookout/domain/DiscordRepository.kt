@@ -1,11 +1,11 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
-import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
-import xyz.deseteral.jaruga.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 
 interface DiscordRepository {
     suspend fun notifyViaWebhook(
         incident: Incident,
-        webhook: Configuration.NotificationChannel.DiscordWebhook,
+        webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
     )
 }

@@ -20,9 +20,9 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.lookout.domain.DiscordRepository
-import xyz.deseteral.jaruga.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 import kotlin.time.Instant
 
 class DiscordClient : DiscordRepository {
@@ -30,7 +30,7 @@ class DiscordClient : DiscordRepository {
 
     override suspend fun notifyViaWebhook(
         incident: Incident,
-        webhook: Configuration.NotificationChannel.DiscordWebhook,
+        webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
     ) {
         val messageId = messageIds[incident.id]
         val embeds = listOf(incident.toDiscordEmbed())
@@ -45,7 +45,7 @@ class DiscordClient : DiscordRepository {
 
     private suspend fun createMessage(
         embeds: List<DiscordWebhookRequestBody.Embed>,
-        webhook: Configuration.NotificationChannel.DiscordWebhook,
+        webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
     ): String {
         val url = URLBuilder(webhook.url).apply {
             parameters.append("wait", "true")
@@ -62,7 +62,7 @@ class DiscordClient : DiscordRepository {
     private suspend fun editMessage(
         messageId: String,
         embeds: List<DiscordWebhookRequestBody.Embed>,
-        webhook: Configuration.NotificationChannel.DiscordWebhook,
+        webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
     ) {
         val url = URLBuilder(webhook.url).apply {
             appendPathSegments("messages", messageId)

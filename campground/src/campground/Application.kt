@@ -7,10 +7,10 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
 import xyz.deseteral.jaruga.ranger.campground.api.systemStatusEndpoint
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
 import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.ranger.campground.external.TeslaMateClient
+import xyz.deseteral.jaruga.ranger.trail.loader.loadCampgroundConfig
 import java.io.File
 import kotlin.time.Clock
 
@@ -23,10 +23,7 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadUserConfiguration<Configuration, CampgroundConfigurationScript>(
-        Configuration::class,
-        File("config.campground.kts"),
-    )
+    val configuration = loadCampgroundConfig(File("config.campground.kts"))
 
     install(ContentNegotiation) {
         json()
@@ -35,8 +32,9 @@ fun Application.module() {
     val statusService = StatusService(
         homeAssistantRepositoryProvider = { HomeAssistantClient(it) },
         teslaMateRepositoryProvider = { TeslaMateClient(it) },
-        Clock.System,
-        configuration,
+        sources = configuration.sources,
+        checks = configuration.checks,
+        clock = Clock.System,
     )
 
     routing {

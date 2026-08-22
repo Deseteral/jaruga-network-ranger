@@ -1,15 +1,15 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
-import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
-import xyz.deseteral.jaruga.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 
 class NotificationService(
     val discordRepository: DiscordRepository,
-    val config: Configuration.Notifier,
+    val config: LookoutConfig.Notifier,
 ) {
     suspend fun sendNotification(incident: Incident) {
         when (val notification = config.process(incident)) {
-            is Configuration.NotificationChannel.DiscordWebhook ->
+            is LookoutConfig.NotificationChannel.DiscordWebhook ->
                 discordRepository.notifyViaWebhook(incident, notification)
         }
     }

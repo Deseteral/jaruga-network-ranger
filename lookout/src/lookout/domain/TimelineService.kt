@@ -1,10 +1,10 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
-import xyz.deseteral.jaruga.ranger.domain.CheckId
-import xyz.deseteral.jaruga.ranger.domain.CheckResult
-import xyz.deseteral.jaruga.ranger.domain.SystemStatus
-import xyz.deseteral.jaruga.ranger.domain.CheckResult.State.FAILURE
-import xyz.deseteral.jaruga.ranger.domain.CheckResult.State.SUCCESS
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.FAILURE
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.SUCCESS
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.filter

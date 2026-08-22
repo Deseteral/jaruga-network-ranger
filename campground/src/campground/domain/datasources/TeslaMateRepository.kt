@@ -1,13 +1,10 @@
 package xyz.deseteral.jaruga.ranger.campground.domain.datasources
 
-import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
+import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 
 interface TeslaMateRepository {
-    suspend fun getState(): TeslaMateState?
+    suspend fun getState(): CampgroundContext.TeslaMate?
 }
 
-typealias TeslaMateRepositoryProvider = (dataSource: Configuration.DataSource.TeslaMate) -> TeslaMateRepository
-
-data class TeslaMateState(
-    val isUpdateAvailable: Boolean,
-)
+typealias TeslaMateRepositoryProvider = (dataSource: CampgroundConfig.DataSource.TeslaMate) -> TeslaMateRepository
