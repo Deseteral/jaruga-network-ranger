@@ -14,10 +14,10 @@ import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromT
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
 fun loadCampgroundConfig(file: File): CampgroundConfig =
-    loadUserConfiguration<CampgroundConfig, CampgroundConfigurationScript>(CampgroundConfig::class, file)
+    loadUserConfiguration<CampgroundConfig, CampgroundConfigScript>(CampgroundConfig::class, file)
 
 fun loadLookoutConfig(file: File): LookoutConfig =
-    loadUserConfiguration<LookoutConfig, LookoutConfigurationScript>(LookoutConfig::class, file)
+    loadUserConfiguration<LookoutConfig, LookoutConfigScript>(LookoutConfig::class, file)
 
 private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }

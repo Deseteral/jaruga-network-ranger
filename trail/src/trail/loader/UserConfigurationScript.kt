@@ -9,21 +9,21 @@ import kotlin.script.experimental.jvm.util.classpathFromClass
 @KotlinScript(
     displayName = "Campground config",
     fileExtension = "campground.kts",
-    compilationConfiguration = UserConfigurationScriptCompilationConfiguration::class,
+    compilationConfiguration = TrailScriptCompilationConfiguration::class,
 )
-abstract class CampgroundConfigurationScript
+abstract class CampgroundConfigScript
 
 @KotlinScript(
     displayName = "Lookout config",
     fileExtension = "lookout.kts",
-    compilationConfiguration = UserConfigurationScriptCompilationConfiguration::class,
+    compilationConfiguration = TrailScriptCompilationConfiguration::class,
 )
-abstract class LookoutConfigurationScript
+abstract class LookoutConfigScript
 
-object UserConfigurationScriptCompilationConfiguration : ScriptCompilationConfiguration(
+object TrailScriptCompilationConfiguration : ScriptCompilationConfiguration(
     {
         jvm {
-            updateClasspath(classpathFromClass(CampgroundConfigurationScript::class))
+            updateClasspath(classpathFromClass(CampgroundConfigScript::class))
         }
     },
 )
