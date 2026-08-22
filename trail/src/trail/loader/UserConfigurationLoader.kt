@@ -17,7 +17,7 @@ fun loadCampgroundConfig(file: File): CampgroundConfig =
     loadUserConfiguration<CampgroundConfig, CampgroundConfigurationScript>(CampgroundConfig::class, file)
 
 fun loadLookoutConfig(file: File): LookoutConfig =
-    loadUserConfiguration<LookoutConfig, CampgroundConfigurationScript>(LookoutConfig::class, file)
+    loadUserConfiguration<LookoutConfig, LookoutConfigurationScript>(LookoutConfig::class, file)
 
 private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }

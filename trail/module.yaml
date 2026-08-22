@@ -5,6 +5,14 @@ settings:
     version: 2.4.0
     serialization: json
     optIns: [ kotlinx.serialization.ExperimentalSerializationApi ]
+  publishing:
+    enabled: true
+    group: xyz.deseteral.jaruga.ranger
+    version: 1.0.0
+
+repositories:
+  - url: mavenLocal
+    publish: true
 
 dependencies:
   - org.jetbrains.kotlin:kotlin-scripting-common:2.4.0

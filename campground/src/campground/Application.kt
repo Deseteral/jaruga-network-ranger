@@ -23,7 +23,8 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadCampgroundConfig(File("config.campground.kts"))
+    // TODO: Setup data path configuration via ENV.
+    val configuration = loadCampgroundConfig(File("dev-data/config.campground.kts"))
 
     install(ContentNegotiation) {
         json()

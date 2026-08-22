@@ -30,7 +30,8 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadLookoutConfig(File("config.lookout.kts"))
+    // TODO: Setup data path configuration via ENV.
+    val configuration = loadLookoutConfig(File("dev-data/config.lookout.kts"))
 
     install(ContentNegotiation) {
         json()

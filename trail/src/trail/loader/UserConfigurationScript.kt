@@ -6,12 +6,14 @@ import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
 import kotlin.script.experimental.jvm.jvm
 
 @KotlinScript(
+    displayName = "Campground config",
     fileExtension = "campground.kts",
     compilationConfiguration = UserConfigurationScriptCompilationConfiguration::class,
 )
 abstract class CampgroundConfigurationScript
 
 @KotlinScript(
+    displayName = "Lookout config",
     fileExtension = "lookout.kts",
     compilationConfiguration = UserConfigurationScriptCompilationConfiguration::class,
 )
