@@ -2,11 +2,16 @@ import {readFileSync} from "node:fs";
 import {createServer, type IncomingMessage, type ServerResponse} from "node:http";
 
 type FaultMode = "ok" | "error" | "timeout" | "close";
-type Source = "homeAssistant" | "teslaMate";
+type Source = "homeAssistant" | "teslaMate" | "discord";
 
 interface HassEntity {
   entity_id: string;
   state: string;
+}
+
+interface DiscordMessage {
+  id: string;
+  body: unknown;
 }
 
 interface MockState {
@@ -23,8 +28,10 @@ const state: MockState = {
   ],
   hassToken: "hass-dev-token",
   tmVersion: "1.34.2",
-  faults: {homeAssistant: "ok", teslaMate: "ok"},
+  faults: {homeAssistant: "ok", teslaMate: "ok", discord: "ok"},
 };
+
+const discordMessages: DiscordMessage[] = [];
 
 const UI_HTML = readFileSync(new URL("./mock-server.html", import.meta.url), "utf8");
 
@@ -50,6 +57,14 @@ async function readForm(req: IncomingMessage): Promise<Record<string, string>> {
     chunks.push(chunk);
   }
   return Object.fromEntries(new URLSearchParams(Buffer.concat(chunks).toString()));
+}
+
+async function readJson(req: IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(chunk);
+  }
+  return JSON.parse(Buffer.concat(chunks).toString());
 }
 
 function send(res: ServerResponse, status: number, body: string, contentType: string): void {
@@ -107,6 +122,30 @@ function handleHassStates(req: IncomingMessage, res: ServerResponse): void {
 function handleTeslaMateSettings(res: ServerResponse): void {
   const html = `<tr><th>Version</th><td>${escapeHtml(state.tmVersion)}</td></tr>`;
   send(res, 200, html, "text/html; charset=utf-8");
+}
+
+async function handleDiscordCreate(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const message = {
+    id: String(discordMessages.length + 1),
+    body: await readJson(req),
+  };
+  discordMessages.push(message);
+  sendJson(res, 200, {id: message.id});
+}
+
+async function handleDiscordUpdate(
+  req: IncomingMessage,
+  res: ServerResponse,
+  rawMessageId: string,
+): Promise<void> {
+  const body = await readJson(req);
+  const message = discordMessages.find(({id}) => id === decodeURIComponent(rawMessageId));
+  if (!message) {
+    sendError(res, 404, "Unknown Discord message.");
+    return;
+  }
+  message.body = body;
+  sendJson(res, 200, {id: message.id});
 }
 
 // --- UI handlers -------------------------------------------------------------
@@ -169,10 +208,16 @@ function renderStateFragment(): string {
     }))
     .join("");
 
+  const discordMessageRows = discordMessages.toReversed().map((message) => renderTemplate("discord-message-row", {
+    messageId: escapeHtml(message.id),
+    body: escapeHtml(JSON.stringify(message.body, null, 2) ?? ""),
+  })).join("");
+
   return renderTemplate("state-fragment", {
     entityRows,
     tmVersion: escapeHtml(state.tmVersion),
     faultRows,
+    discordMessageRows,
     mockStateJson: escapeHtml(JSON.stringify(state, null, 2) ?? ""),
   });
 }
@@ -223,6 +268,19 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   if (req.method === "GET" && path === "/tm/settings") {
     if (!applyFault(res, "teslaMate")) return;
     handleTeslaMateSettings(res);
+    return;
+  }
+
+  const discordMessagePath = path.match(/^\/discord\/messages\/([^/]+)$/);
+  if (req.method === "PATCH" && discordMessagePath !== null) {
+    if (!applyFault(res, "discord")) return;
+    await handleDiscordUpdate(req, res, discordMessagePath[1]);
+    return;
+  }
+
+  if (req.method === "POST" && path === "/discord") {
+    if (!applyFault(res, "discord")) return;
+    await handleDiscordCreate(req, res);
     return;
   }
 
