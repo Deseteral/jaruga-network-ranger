@@ -117,4 +117,3 @@ http-client.private.env.json
 build/
 
 active-incidents.json
-config.lookout.kts
