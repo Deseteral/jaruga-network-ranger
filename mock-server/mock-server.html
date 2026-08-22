@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jaruga Ranger mock server</title>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.js" integrity="sha384-Q+Dky3iHVJOr6wUjQ4ulh6uQ76an/t+ak1+PjMVaxRjbZamFLAG+u9InkfjbsEQf" crossorigin="anonymous"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table, td, th {
+      border: 1px solid black;
+      padding: 2px;
+    }
+
+    fieldset {
+      margin-bottom: 8px;
+    }
+
+    .vertical {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .horizontal {
+      display: flex;
+      flex-direction: row;
+    }
+  </style>
+</head>
+<body>
+<div id="mock-state" hx-get="/ui/state" hx-trigger="load" hx-swap="outerHTML"></div>
+</body>
+
+<template id="state-fragment">
+  <h1>Campground mock sources</h1>
+  <div id="mock-state" class="horizontal">
+    <div>
+      <fieldset>
+        <legend>Home Assistant entities</legend>
+        <table>
+          <thead>
+          <tr>
+            <th>Entity ID</th>
+            <th>State</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          {{entityRows}}
+          </tbody>
+        </table>
+        <form hx-post="/ui/ha/entities" hx-target="#mock-state" hx-swap="outerHTML">
+          <input name="entity_id" placeholder="ID">
+          <input name="state" placeholder="state">
+          <button type="submit">Add entity</button>
+        </form>
+      </fieldset>
+      <fieldset>
+        <legend>TeslaMate instance version</legend>
+        <form hx-put="/ui/tm/version" hx-target="#mock-state" hx-swap="outerHTML">
+          <label>Version <input name="version" value="{{tmVersion}}"></label>
+          <button type="submit">Save</button>
+        </form>
+      </fieldset>
+      <fieldset>
+        <legend>Fault injection</legend>
+        <table>
+          <thead>
+          <tr>
+            <th>Source</th>
+            <th>Mode</th>
+          </tr>
+          </thead>
+          <tbody>
+          {{faultRows}}
+          </tbody>
+        </table>
+      </fieldset>
+    </div>
+    <div>
+      <fieldset>
+        <legend>Mock state</legend>
+        <pre><code>{{mockStateJson}}</code></pre>
+      </fieldset>
+    </div>
+  </div>
+</template>
+
+<template id="entity-row">
+  <tr>
+    <td><code>{{entityId}}</code></td>
+    <td>
+      <form hx-post="/ui/ha/entities" hx-target="#mock-state" hx-swap="outerHTML">
+        <input type="hidden" name="entity_id" value="{{entityId}}">
+        <input name="state" value="{{entityState}}">
+        <button type="submit">Set</button>
+      </form>
+    </td>
+    <td>
+      <button hx-delete="/ui/ha/entities/{{encodedEntityId}}" hx-target="#mock-state" hx-swap="outerHTML">
+        Remove
+      </button>
+    </td>
+  </tr>
+</template>
+
+<template id="fault-row">
+  <tr>
+    <td><code>{{source}}</code></td>
+    <td>
+      <form hx-put="/ui/faults/{{source}}" hx-trigger="change" hx-target="#mock-state" hx-swap="outerHTML">
+        <select name="mode">{{options}}</select>
+      </form>
+    </td>
+  </tr>
+</template>
+
+<template id="fault-mode-option">
+  <option value="{{mode}}" {{selected}}>{{mode}}</option>
+</template>
+</html>
