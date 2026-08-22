@@ -3,28 +3,21 @@ package xyz.deseteral.jaruga.ranger.campground
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
+import kotlinx.io.files.Path
 import xyz.deseteral.jaruga.ranger.campground.api.systemStatusEndpoint
 import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
 import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.ranger.campground.external.TeslaMateClient
 import xyz.deseteral.jaruga.ranger.trail.loader.loadCampgroundConfig
-import java.io.File
 import kotlin.time.Clock
 
-fun main() {
-    embeddedServer(
-        factory = io.ktor.server.netty.Netty,
-        port = 8080,
-        module = Application::module,
-    ).start(wait = true)
-}
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
-    // TODO: Setup data path configuration via ENV.
-    val configuration = loadCampgroundConfig(File("dev-data/config.campground.kts"))
+    val dataDirectoryPath = Path(environment.config.property("campground.data_path").getString())
+    val config = loadCampgroundConfig(Path(dataDirectoryPath, "config.campground.kts"))
 
     install(ContentNegotiation) {
         json()
@@ -33,8 +26,8 @@ fun Application.module() {
     val statusService = StatusService(
         homeAssistantRepositoryProvider = { HomeAssistantClient(it) },
         teslaMateRepositoryProvider = { TeslaMateClient(it) },
-        sources = configuration.sources,
-        checks = configuration.checks,
+        sources = config.sources,
+        checks = config.checks,
         clock = Clock.System,
     )
 

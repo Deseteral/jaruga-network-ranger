@@ -1,5 +1,6 @@
 package xyz.deseteral.jaruga.ranger.trail.loader
 
+import kotlinx.io.files.Path
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
 import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import java.io.File
@@ -13,13 +14,14 @@ import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
-fun loadCampgroundConfig(file: File): CampgroundConfig =
-    loadUserConfiguration<CampgroundConfig, CampgroundConfigScript>(CampgroundConfig::class, file)
+fun loadCampgroundConfig(path: Path): CampgroundConfig =
+    loadUserConfiguration<CampgroundConfig, CampgroundConfigScript>(CampgroundConfig::class, path)
 
-fun loadLookoutConfig(file: File): LookoutConfig =
-    loadUserConfiguration<LookoutConfig, LookoutConfigScript>(LookoutConfig::class, file)
+fun loadLookoutConfig(path: Path): LookoutConfig =
+    loadUserConfiguration<LookoutConfig, LookoutConfigScript>(LookoutConfig::class, path)
 
-private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
+private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, path: Path): T {
+    val file = File(path.toString())
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }
 
     val classLoader = Thread.currentThread().contextClassLoader

@@ -2,16 +2,17 @@ product: jvm/app
 
 settings:
   kotlin:
-    version: 2.4.0
+    version: 2.4.10
     serialization: json
     optIns: [ kotlinx.serialization.ExperimentalSerializationApi ]
   ktor:
     enabled: true
-    version: 3.5.1
+    version: 3.5.2
 
 dependencies:
   - ../trail
   - org.jetbrains.kotlinx:kotlinx-datetime:0.8.0
+  - org.jetbrains.kotlinx:kotlinx-io-core:0.9.1
   - $ktor.server.core
   - $ktor.server.netty
   - $ktor.server.contentNegotiation
