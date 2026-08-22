@@ -9,9 +9,9 @@ import xyz.deseteral.jaruga.ranger.campground.domain.datasources.Hass
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepositoryProvider
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepositoryProvider
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateState
-import xyz.deseteral.jaruga.network.ranger.domain.CheckId
-import xyz.deseteral.jaruga.network.ranger.domain.CheckResult
-import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
+import xyz.deseteral.jaruga.ranger.domain.CheckId
+import xyz.deseteral.jaruga.ranger.domain.CheckResult
+import xyz.deseteral.jaruga.ranger.domain.SystemStatus
 import kotlin.collections.forEach
 import kotlin.time.Clock
 

@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.lookout.domain.DiscordRepository
-import xyz.deseteral.jaruga.network.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.domain.Incident
 import kotlin.time.Instant
 
 class DiscordClient : DiscordRepository {

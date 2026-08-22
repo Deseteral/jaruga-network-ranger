@@ -1,7 +1,7 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
 import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
-import xyz.deseteral.jaruga.network.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.domain.Incident
 
 class NotificationService(
     val discordRepository: DiscordRepository,

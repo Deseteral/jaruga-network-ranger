@@ -16,7 +16,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.serialization.json.Json
 import xyz.deseteral.jaruga.ranger.lookout.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.lookout.domain.CampgroundRepository
-import xyz.deseteral.jaruga.network.ranger.domain.SystemStatus
+import xyz.deseteral.jaruga.ranger.domain.SystemStatus
 import kotlin.time.Duration
 
 private val logger = KotlinLogging.logger {}

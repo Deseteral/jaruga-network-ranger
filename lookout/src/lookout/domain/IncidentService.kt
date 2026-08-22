@@ -1,7 +1,7 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
-import xyz.deseteral.jaruga.network.ranger.domain.CheckId
-import xyz.deseteral.jaruga.network.ranger.domain.Incident
+import xyz.deseteral.jaruga.ranger.domain.CheckId
+import xyz.deseteral.jaruga.ranger.domain.Incident
 
 class IncidentService(
     private val timelineService: TimelineService,
