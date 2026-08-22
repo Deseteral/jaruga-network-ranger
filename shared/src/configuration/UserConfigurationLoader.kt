@@ -11,13 +11,13 @@ import kotlin.script.experimental.jvmhost.BasicJvmScriptingHost
 import kotlin.script.experimental.jvmhost.createJvmCompilationConfigurationFromTemplate
 import kotlin.script.experimental.jvmhost.createJvmEvaluationConfigurationFromTemplate
 
-fun <T : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
+inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T {
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }
 
     val classLoader = Thread.currentThread().contextClassLoader
     val script = file.toScriptSource()
-    val compilationConfiguration = createJvmCompilationConfigurationFromTemplate<UserConfigurationScript>()
-    val evaluationConfiguration = createJvmEvaluationConfigurationFromTemplate<UserConfigurationScript> {
+    val compilationConfiguration = createJvmCompilationConfigurationFromTemplate<ScriptConfigT>()
+    val evaluationConfiguration = createJvmEvaluationConfigurationFromTemplate<ScriptConfigT> {
         jvm {
             baseClassLoader(classLoader)
         }
@@ -26,12 +26,15 @@ fun <T : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T
     val result = BasicJvmScriptingHost().eval(script, compilationConfiguration, evaluationConfiguration)
 
     val returnValue = when (result) {
-        is ResultWithDiagnostics.Failure -> throw IllegalArgumentException(
-            "Could not compile configuration script ${file.absolutePath}:\n${result.formatDiagnostics()}",
-        )
+        is ResultWithDiagnostics.Failure -> {
+            val diagnostics = result.reports.joinToString("\n") { report -> "${report.severity}: ${report.message}" }
+            throw IllegalArgumentException(
+                "Could not compile configuration script ${file.absolutePath}:\n$diagnostics",
+            )
+        }
 
         is ResultWithDiagnostics.Success -> result.value.returnValue
-    }
+   }
 
     return when (returnValue) {
         is ResultValue.Value -> {
@@ -54,6 +57,3 @@ fun <T : Any> loadUserConfiguration(configurationType: KClass<T>, file: File): T
         )
     }
 }
-
-private fun ResultWithDiagnostics.Failure.formatDiagnostics(): String =
-    reports.joinToString("\n") { report -> "${report.severity}: ${report.message}" }

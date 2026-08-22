@@ -18,6 +18,7 @@ import xyz.deseteral.jaruga.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.lookout.external.CampgroundClient
 import xyz.deseteral.jaruga.lookout.external.DiscordClient
 import xyz.deseteral.jaruga.lookout.external.FilePersistentCache
+import xyz.deseteral.jaruga.network.ranger.configuration.LookoutConfigurationScript
 import xyz.deseteral.jaruga.network.ranger.configuration.loadUserConfiguration
 import java.io.File
 import kotlin.time.Clock
@@ -31,7 +32,10 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadUserConfiguration(Configuration::class, File("lookout.configuration.kts"))
+    val configuration = loadUserConfiguration<Configuration, LookoutConfigurationScript>(
+        Configuration::class,
+        File("config.lookout.kts"),
+    )
 
     install(ContentNegotiation) {
         json()

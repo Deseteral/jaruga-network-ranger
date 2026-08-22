@@ -11,6 +11,7 @@ import xyz.deseteral.jaruga.campground.configuration.Configuration
 import xyz.deseteral.jaruga.campground.domain.StatusService
 import xyz.deseteral.jaruga.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.campground.external.TeslaMateClient
+import xyz.deseteral.jaruga.network.ranger.configuration.CampgroundConfigurationScript
 import xyz.deseteral.jaruga.network.ranger.configuration.loadUserConfiguration
 import java.io.File
 import kotlin.time.Clock
@@ -24,7 +25,10 @@ fun main() {
 }
 
 fun Application.module() {
-    val configuration = loadUserConfiguration(Configuration::class, File("campground.configuration.kts"))
+    val configuration = loadUserConfiguration<Configuration, CampgroundConfigurationScript>(
+        Configuration::class,
+        File("config.campground.kts"),
+    )
 
     install(ContentNegotiation) {
         json()

@@ -117,4 +117,5 @@ http-client.private.env.json
 build/
 
 active-incidents.json
-*.configuration.kts
+config.campground.kts
+config.lookout.kts
