@@ -34,7 +34,12 @@ class FilePersistentCache<T>(
     }
 
     companion object {
-        inline fun <reified T> json(name: String, dataDirectoryPath: Path, fileSystem: FileSystem, format: Boolean = false) = FilePersistentCache(
+        inline fun <reified T> json(
+            name: String,
+            dataDirectoryPath: Path,
+            fileSystem: FileSystem,
+            format: Boolean = false,
+        ) = FilePersistentCache(
             path = Path(dataDirectoryPath, "$name.json"),
             fileSystem = fileSystem,
             stringFormat = Json { prettyPrint = format },

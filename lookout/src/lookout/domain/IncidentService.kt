@@ -39,7 +39,10 @@ class IncidentService(
 
             val resolvedIncident = currentIncident.copy(
                 resolvedOn = checkResult.timestamp,
-                history = currentIncident.history + Incident.HistoryEntry(timestamp = checkResult.timestamp, state = checkResult.state),
+                history = currentIncident.history + Incident.HistoryEntry(
+                    timestamp = checkResult.timestamp,
+                    state = checkResult.state,
+                ),
             )
 
             resolvedIncidents.add(resolvedIncident)

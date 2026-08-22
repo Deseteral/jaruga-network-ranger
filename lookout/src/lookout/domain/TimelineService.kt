@@ -5,9 +5,6 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.SUCCESS
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.filter
 import kotlin.time.Clock
 
 /**

@@ -20,7 +20,10 @@ fun loadCampgroundConfig(path: Path): CampgroundConfig =
 fun loadLookoutConfig(path: Path): LookoutConfig =
     loadUserConfiguration<LookoutConfig, LookoutConfigScript>(LookoutConfig::class, path)
 
-private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(configurationType: KClass<T>, path: Path): T {
+private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(
+    configurationType: KClass<T>,
+    path: Path,
+): T {
     val file = File(path.toString())
     require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }
 
@@ -44,7 +47,7 @@ private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(
         }
 
         is ResultWithDiagnostics.Success -> result.value.returnValue
-   }
+    }
 
     return when (returnValue) {
         is ResultValue.Value -> {
