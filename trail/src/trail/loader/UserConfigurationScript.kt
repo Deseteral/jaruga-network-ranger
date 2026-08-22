@@ -2,8 +2,9 @@ package xyz.deseteral.jaruga.ranger.trail.loader
 
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
-import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
 import kotlin.script.experimental.jvm.jvm
+import kotlin.script.experimental.jvm.updateClasspath
+import kotlin.script.experimental.jvm.util.classpathFromClass
 
 @KotlinScript(
     displayName = "Campground config",
@@ -22,7 +23,7 @@ abstract class LookoutConfigurationScript
 object UserConfigurationScriptCompilationConfiguration : ScriptCompilationConfiguration(
     {
         jvm {
-            dependenciesFromCurrentContext(wholeClasspath = true)
+            updateClasspath(classpathFromClass(CampgroundConfigurationScript::class))
         }
     },
 )
