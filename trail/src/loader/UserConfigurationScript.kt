@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.network.ranger.configuration
+package xyz.deseteral.jaruga.network.ranger.trail.loader
 
 import kotlin.script.experimental.annotations.KotlinScript
 import kotlin.script.experimental.api.ScriptCompilationConfiguration

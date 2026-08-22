@@ -1,4 +1,4 @@
-package xyz.deseteral.jaruga.network.ranger.configuration
+package xyz.deseteral.jaruga.network.ranger.trail.loader
 
 import java.io.File
 import kotlin.reflect.KClass
