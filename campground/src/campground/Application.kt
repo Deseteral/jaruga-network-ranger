@@ -11,8 +11,6 @@ import xyz.deseteral.jaruga.ranger.campground.configuration.Configuration
 import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
 import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.ranger.campground.external.TeslaMateClient
-import xyz.deseteral.jaruga.network.ranger.configuration.CampgroundConfigurationScript
-import xyz.deseteral.jaruga.network.ranger.configuration.loadUserConfiguration
 import java.io.File
 import kotlin.time.Clock
 

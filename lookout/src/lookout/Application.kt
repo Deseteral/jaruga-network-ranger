@@ -18,8 +18,6 @@ import xyz.deseteral.jaruga.ranger.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.ranger.lookout.external.CampgroundClient
 import xyz.deseteral.jaruga.ranger.lookout.external.DiscordClient
 import xyz.deseteral.jaruga.ranger.lookout.external.FilePersistentCache
-import xyz.deseteral.jaruga.network.ranger.configuration.LookoutConfigurationScript
-import xyz.deseteral.jaruga.network.ranger.configuration.loadUserConfiguration
 import java.io.File
 import kotlin.time.Clock
 
