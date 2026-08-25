@@ -12,17 +12,22 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
+import xyz.deseteral.jaruga.ranger.campground.utils.PeriodicallyComputedValue
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 private val logger = KotlinLogging.logger {}
 
 class TeslaMateClient(
     private val config: CampgroundConfig.DataSource.TeslaMate,
 ) : TeslaMateRepository {
+    private val latestVersion = PeriodicallyComputedValue(period = 1.hours) { getLatestVersion() }
+
     override suspend fun getState(): CampgroundContext.TeslaMate? {
         val instanceVersion = getInstanceVersion() ?: return null
-        val latestVersion = getLatestVersion() ?: return null
+        val latestVersion = this.latestVersion.value ?: return null
 
         return CampgroundContext.TeslaMate(
             isUpdateAvailable = instanceVersion != latestVersion,
@@ -42,7 +47,6 @@ class TeslaMateClient(
         }
     }
 
-    // TODO: Cache this to get around rate limiting.
     private suspend fun getLatestVersion(): String? {
         return try {
             githubApiClient
