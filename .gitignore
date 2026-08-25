@@ -115,5 +115,6 @@ http-client.private.env.json
 .idea/**/copilot.data.migration.*.xml
 
 build/
+node_modules/
 
 active-incidents.json

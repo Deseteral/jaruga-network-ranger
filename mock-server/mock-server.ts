@@ -46,8 +46,9 @@ function renderTemplate(name: string, values: Record<string, string>): string {
   const template = HTML_TEMPLATES.get(name);
   if (!template) throw new Error(`Unknown HTML template: ${name}`);
   return template.replaceAll(/\{\{\s*([A-Za-z][A-Za-z0-9]*)\s*\}\}/g, (_, key: string) => {
-    if (!(key in values)) throw new Error(`Missing value "${key}" for HTML template "${name}".`);
-    return values[key];
+    const value = values[key];
+    if (!value) throw new Error(`Missing value "${key}" for HTML template "${name}".`);
+    return value;
   });
 }
 
@@ -157,8 +158,8 @@ async function handleUiHassEntities(
 ): Promise<void> {
   if (!action) {
     const body = await readForm(req);
-    const entityId = body.entity_id.trim();
-    const entityState = body.state.trim();
+    const entityId = body.entity_id?.trim() ?? "";
+    const entityState = body.state?.trim() ?? "";
     const existing = state.hassEntities.find((e) => e.entity_id === entityId);
     if (existing) {
       existing.state = entityState;
@@ -174,6 +175,7 @@ async function handleUiHassEntities(
 
 async function handleUiTeslaMateVersion(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const body = await readForm(req);
+  if (!body.version) return;
   state.tmVersion = body.version;
   respondMutation(res);
 }
@@ -255,7 +257,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
   const faultPath = path.match(/^\/ui\/faults\/([^/]+)$/);
   if (req.method === "PUT" && faultPath !== null) {
-    await handleUiFault(req, res, faultPath[1]);
+    await handleUiFault(req, res, faultPath[1]!);
     return;
   }
 
@@ -274,7 +276,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const discordMessagePath = path.match(/^\/discord\/messages\/([^/]+)$/);
   if (req.method === "PATCH" && discordMessagePath !== null) {
     if (!applyFault(res, "discord")) return;
-    await handleDiscordUpdate(req, res, discordMessagePath[1]);
+    await handleDiscordUpdate(req, res, discordMessagePath[1]!);
     return;
   }
 
