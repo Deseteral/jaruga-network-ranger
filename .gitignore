@@ -117,4 +117,6 @@ http-client.private.env.json
 build/
 node_modules/
 
+.DS_Store
+
 active-incidents.json
