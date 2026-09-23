@@ -14,6 +14,19 @@ interface DiscordMessage {
   body: unknown;
 }
 
+type LookoutCheckState = "SUCCESS" | "FAILURE";
+
+interface LookoutCheckResult {
+  description: string | null;
+  state: LookoutCheckState;
+  severity: "MAJOR" | "MINOR";
+  timestamp: string;
+}
+
+interface LookoutStatus {
+  checks: Record<string, (LookoutCheckResult | null)[]>;
+}
+
 interface MockState {
   hassEntities: HassEntity[];
   hassToken: string;
@@ -187,6 +200,16 @@ async function handleUiFault(req: IncomingMessage, res: ServerResponse, rawSourc
   respondMutation(res);
 }
 
+async function handleUiLookoutStatus(res: ServerResponse): Promise<void> {
+  let timelineRows: string;
+  try {
+    timelineRows = renderTimelineRows(await fetchLookoutStatus());
+  } catch (ex: unknown) {
+    timelineRows = renderMessageRow(`Could not reach lookout: ${ex instanceof Error ? ex.message : String(ex)}`);
+  }
+  send(res, 200, renderTemplate("lookout-status", {timelineRows}), "text/html; charset=utf-8");
+}
+
 // --- Web UI ------------------------------------------------------------------
 
 const FAULT_MODES: FaultMode[] = ["ok", "error", "timeout", "close"];
@@ -224,6 +247,39 @@ function renderStateFragment(): string {
   });
 }
 
+// --- Lookout status ----------------------------------------------------------
+
+const LOOKOUT_URL = "http://localhost:8081";
+
+const CHECK_STATE_SYMBOLS: Record<LookoutCheckState | "unknown", string> = {
+  SUCCESS: "▮",
+  FAILURE: "▯",
+  unknown: "•",
+};
+
+async function fetchLookoutStatus(): Promise<LookoutStatus> {
+  const response = await fetch(new URL("/status", LOOKOUT_URL));
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return (await response.json()) as LookoutStatus;
+}
+
+function renderMessageRow(message: string): string {
+  return renderTemplate("lookout-status-message-row", {message: escapeHtml(message)});
+}
+
+function renderTimelineRows(status: LookoutStatus): string {
+  const checks = Object.entries(status.checks);
+  if (checks.length === 0) return renderMessageRow("No checks known to Lookout yet.");
+  return checks
+    .map(([checkId, timeline]) => renderTemplate("lookout-timeline-row", {
+      checkId: escapeHtml(checkId),
+      timeline: timeline
+        .map((result) => CHECK_STATE_SYMBOLS[result?.state ?? "unknown"])
+        .join(""),
+    }))
+    .join("");
+}
+
 // --- Routing -----------------------------------------------------------------
 
 async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -236,6 +292,11 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
   if (req.method === "GET" && path === "/ui/state") {
     send(res, 200, renderStateFragment(), "text/html; charset=utf-8");
+    return;
+  }
+
+  if (req.method === "GET" && path === "/ui/lookout/status") {
+    await handleUiLookoutStatus(res);
     return;
   }
 

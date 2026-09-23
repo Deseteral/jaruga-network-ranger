@@ -41,6 +41,11 @@
 </head>
 <body>
 <div id="mock-state" hx-get="/ui/state" hx-trigger="load" hx-swap="outerHTML"></div>
+
+<fieldset id="lookout-status" hx-get="/ui/lookout/status" hx-trigger="load, every 1s"
+          hx-target="#lookout-status" hx-swap="outerHTML">
+  <legend>Lookout check timelines</legend>
+</fieldset>
 </body>
 
 <template id="state-fragment">
@@ -156,6 +161,37 @@
     <td>
       <pre><code>{{body}}</code></pre>
     </td>
+  </tr>
+</template>
+
+<template id="lookout-status">
+  <fieldset id="lookout-status" hx-get="/ui/lookout/status" hx-trigger="every 1s"
+            hx-target="#lookout-status" hx-swap="outerHTML">
+    <legend>Lookout check timelines</legend>
+    <table>
+      <thead>
+      <tr>
+        <th>Check ID</th>
+        <th>Timeline</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{timelineRows}}
+      </tbody>
+    </table>
+  </fieldset>
+</template>
+
+<template id="lookout-timeline-row">
+  <tr>
+    <td><code>{{checkId}}</code></td>
+    <td><code>{{timeline}}</code></td>
+  </tr>
+</template>
+
+<template id="lookout-status-message-row">
+  <tr>
+    <td colspan="2">{{message}}</td>
   </tr>
 </template>
 </html>
