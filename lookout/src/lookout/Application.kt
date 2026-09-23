@@ -4,12 +4,11 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import xyz.deseteral.jaruga.ranger.lookout.api.statusEndpoint
 import xyz.deseteral.jaruga.ranger.lookout.domain.IncidentService
 import xyz.deseteral.jaruga.ranger.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.ranger.lookout.domain.ProbeService
@@ -55,8 +54,6 @@ fun Application.module() {
     }
 
     routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
+        statusEndpoint(timelineService)
     }
 }

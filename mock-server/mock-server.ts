@@ -47,7 +47,7 @@ function renderTemplate(name: string, values: Record<string, string>): string {
   if (!template) throw new Error(`Unknown HTML template: ${name}`);
   return template.replaceAll(/\{\{\s*([A-Za-z][A-Za-z0-9]*)\s*\}\}/g, (_, key: string) => {
     const value = values[key];
-    if (!value) throw new Error(`Missing value "${key}" for HTML template "${name}".`);
+    if (value === undefined) throw new Error(`Missing value "${key}" for HTML template "${name}".`);
     return value;
   });
 }

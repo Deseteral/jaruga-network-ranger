@@ -30,6 +30,12 @@ class TimelineService(
         get() = systemChecks + userDefinedChecks
 
     /**
+     * Returns timelines of all known checks.
+     */
+    fun getCheckTimelines(): Map<CheckId, Timeline> =
+        allChecks
+
+    /**
      * Returns latest [CheckResult] for given [CheckId].
      * Returns null if given ID is not recorded or the check's state is unknown.
      */
