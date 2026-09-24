@@ -3,8 +3,9 @@ package xyz.deseteral.jaruga.ranger.campground.domain
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepositoryProvider
-import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepositoryProvider
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.DataSourceProvider
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepository
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
@@ -15,8 +16,8 @@ import kotlin.time.Clock
 private val logger = KotlinLogging.logger {}
 
 class StatusService(
-    private val homeAssistantRepositoryProvider: HomeAssistantRepositoryProvider,
-    private val teslaMateRepositoryProvider: TeslaMateRepositoryProvider,
+    private val homeAssistantRepositoryProvider: DataSourceProvider<CampgroundConfig.DataSource.HomeAssistant, HomeAssistantRepository>,
+    private val teslaMateRepositoryProvider: DataSourceProvider<CampgroundConfig.DataSource.TeslaMate, TeslaMateRepository>,
     private val sources: Map<String, CampgroundConfig.DataSource>,
     private val checks: List<CampgroundConfig.CheckDefinition>,
     private val clock: Clock,
@@ -29,10 +30,10 @@ class StatusService(
             sources.forEach { (name, dataSource) ->
                 when (dataSource) {
                     is CampgroundConfig.DataSource.HomeAssistant ->
-                        hass[name] = async { homeAssistantRepositoryProvider(dataSource).getHass() }.await()
+                        hass[name] = async { homeAssistantRepositoryProvider.of(dataSource).getHass() }.await()
 
                     is CampgroundConfig.DataSource.TeslaMate ->
-                        teslaMate[name] = async { teslaMateRepositoryProvider(dataSource).getState() }.await()
+                        teslaMate[name] = async { teslaMateRepositoryProvider.of(dataSource).getState() }.await()
                 }
             }
         }.toDomain()

@@ -8,6 +8,7 @@ import io.ktor.server.routing.routing
 import kotlinx.io.files.Path
 import xyz.deseteral.jaruga.ranger.campground.api.systemStatusEndpoint
 import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.DataSourceProvider
 import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
 import xyz.deseteral.jaruga.ranger.campground.external.TeslaMateClient
 import xyz.deseteral.jaruga.ranger.trail.loader.loadCampgroundConfig
@@ -24,8 +25,8 @@ fun Application.module() {
     }
 
     val statusService = StatusService(
-        homeAssistantRepositoryProvider = { HomeAssistantClient(it) },
-        teslaMateRepositoryProvider = { TeslaMateClient(it) },
+        homeAssistantRepositoryProvider = DataSourceProvider { HomeAssistantClient(it) },
+        teslaMateRepositoryProvider = DataSourceProvider { TeslaMateClient(it) },
         sources = config.sources,
         checks = config.checks,
         clock = Clock.System,
