@@ -75,6 +75,7 @@ class DiscordClient : DiscordRepository {
     }
 
     private val httpClient = HttpClient(CIO) {
+        expectSuccess = true
         install(ContentNegotiation) {
             json(
                 Json {
