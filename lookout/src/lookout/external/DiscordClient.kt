@@ -1,5 +1,11 @@
 package xyz.deseteral.jaruga.ranger.lookout.external
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.coroutines.runSuspendCatching
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.mapError
+import com.github.michaelbull.result.onErr
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -20,10 +26,13 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import xyz.deseteral.jaruga.ranger.lookout.domain.DiscordError
 import xyz.deseteral.jaruga.ranger.lookout.domain.DiscordRepository
 import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 import kotlin.time.Instant
+
+private val logger = KotlinLogging.logger {}
 
 class DiscordClient : DiscordRepository {
     private val messageIds: MutableMap<Incident.Id, String> = mutableMapOf()
@@ -31,47 +40,56 @@ class DiscordClient : DiscordRepository {
     override suspend fun notifyViaWebhook(
         incident: Incident,
         webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
-    ) {
+    ): Result<Unit, DiscordError> {
         val messageId = messageIds[incident.id]
         val embeds = listOf(incident.toDiscordEmbed())
 
-        if (messageId != null) {
+        return if (messageId != null) {
             editMessage(messageId, embeds, webhook)
         } else {
             createMessage(embeds, webhook)
-                .also { messageIds[incident.id] = it }
+                .map { messageIds[incident.id] = it }
         }
     }
 
     private suspend fun createMessage(
         embeds: List<DiscordWebhookRequestBody.Embed>,
         webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
-    ): String {
+    ): Result<String, DiscordError> {
         val url = URLBuilder(webhook.url).apply {
             parameters.append("wait", "true")
         }.toString()
 
-        val response = httpClient.post(url) {
-            contentType(ContentType.Application.Json)
-            setBody(DiscordWebhookRequestBody(embeds))
+        return runSuspendCatching {
+            httpClient.post(url) {
+                contentType(ContentType.Application.Json)
+                setBody(DiscordWebhookRequestBody(embeds))
+            }
         }
-        val body = response.body<DiscordWebhookResponseBody>()
-        return body.id
+            .map { response -> response.body<DiscordWebhookResponseBody>() }
+            .map { body -> body.id }
+            .onErr { ex -> logger.error(ex) { "Discord webhook message creation failed." } }
+            .mapError { DiscordError.WebhookFailed }
     }
 
     private suspend fun editMessage(
         messageId: String,
         embeds: List<DiscordWebhookRequestBody.Embed>,
         webhook: LookoutConfig.NotificationChannel.DiscordWebhook,
-    ) {
+    ): Result<Unit, DiscordError> {
         val url = URLBuilder(webhook.url).apply {
             appendPathSegments("messages", messageId)
         }.toString()
 
-        httpClient.patch(url) {
-            contentType(ContentType.Application.Json)
-            setBody(DiscordWebhookRequestBody(embeds))
+        return runSuspendCatching {
+            httpClient.patch(url) {
+                contentType(ContentType.Application.Json)
+                setBody(DiscordWebhookRequestBody(embeds))
+            }
         }
+            .map { Unit }
+            .onErr { ex -> logger.error(ex) { "Discord webhook message edit failed." } }
+            .mapError { DiscordError.WebhookFailed }
     }
 
     private val httpClient = HttpClient(CIO) {

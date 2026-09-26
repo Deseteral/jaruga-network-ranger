@@ -1,7 +1,12 @@
 package xyz.deseteral.jaruga.ranger.lookout.domain
 
+import com.github.michaelbull.result.getOrElse
+import com.github.michaelbull.result.onErr
+import io.github.oshai.kotlinlogging.KotlinLogging
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
+
+private val logger = KotlinLogging.logger {}
 
 class IncidentService(
     private val timelineService: TimelineService,
@@ -9,7 +14,7 @@ class IncidentService(
     private val activeIncidentsCache: PersistentCache<MutableMap<CheckId, Incident>>,
 ) {
 
-    private val activeIncidents: MutableMap<CheckId, Incident> = activeIncidentsCache.read { mutableMapOf() }
+    private val activeIncidents: MutableMap<CheckId, Incident> = activeIncidentsCache.read { mutableMapOf() }.getOrElse { mutableMapOf() }
     private val resolvedIncidents: MutableList<Incident> = mutableListOf()
 
     suspend fun processTimelineDiff(diff: TimelineService.TimelinesUpdateDiff) {
@@ -30,6 +35,7 @@ class IncidentService(
 
             activeIncidents[checkId] = incident
             notificationService.sendNotification(incident)
+                .onErr { error -> logNotificationFailure(incident, error) }
         }
 
         for (checkId in diff.healed) {
@@ -49,8 +55,15 @@ class IncidentService(
             activeIncidents.remove(checkId)
 
             notificationService.sendNotification(resolvedIncident)
+                .onErr { error -> logNotificationFailure(resolvedIncident, error) }
         }
 
         activeIncidentsCache.write(activeIncidents)
+            .onErr { logger.warn { "Could not persist active incidents cache ($it)." } }
+    }
+
+    // TODO: Sending notifications should not just log, but olso retry.
+    private fun logNotificationFailure(incident: Incident, error: DiscordError) {
+        logger.warn { "Could not send notification for incident ${incident.id} (check ${incident.checkId.value}): $error." }
     }
 }

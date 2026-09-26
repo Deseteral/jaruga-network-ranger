@@ -1,5 +1,9 @@
 package xyz.deseteral.jaruga.ranger.lookout.external
 
+import com.github.michaelbull.result.coroutines.runSuspendCatching
+import com.github.michaelbull.result.get
+import com.github.michaelbull.result.map
+import com.github.michaelbull.result.onErr
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -29,12 +33,10 @@ class CampgroundClient(
     }
 
     private suspend fun getSystemStatus(): SystemStatus? {
-        return try {
-            httpClient.get("${config.instanceUrl}/system/status").body()
-        } catch (ex: Exception) {
-            logger.error(ex) { "Error while getting Campground system status." }
-            null
-        }
+        return runSuspendCatching { httpClient.get("${config.instanceUrl}/system/status") }
+            .map { response -> response.body<SystemStatus>() }
+            .onErr { ex -> logger.error(ex) { "Error while getting Campground system status." } }
+            .get()
     }
 
     private val httpClient = HttpClient(CIO) {
