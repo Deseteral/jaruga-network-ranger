@@ -1,5 +1,8 @@
 package xyz.deseteral.jaruga.ranger.campground.external
 
+import com.github.michaelbull.result.coroutines.runSuspendCatching
+import com.github.michaelbull.result.get
+import com.github.michaelbull.result.onErr
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -7,6 +10,8 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
+import io.ktor.http.URLBuilder
+import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -15,7 +20,6 @@ import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateReposi
 import xyz.deseteral.jaruga.ranger.campground.utils.PeriodicallyComputedValue
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
 private val logger = KotlinLogging.logger {}
@@ -35,28 +39,30 @@ class TeslaMateClient(
     }
 
     private suspend fun getInstanceVersion(): String? {
-        return try {
+        val url = URLBuilder(config.instanceUrl).apply {
+            appendPathSegments("settings")
+        }.toString()
+
+        return runSuspendCatching {
             httpRawTextClient
-                .get("${config.instanceUrl}/settings") { expectSuccess = true }
+                .get(url) { expectSuccess = true }
                 .body<String>()
                 .replace(" ", "").replace("\n", "")
                 .let { VERSION_FROM_HTML_REGEX.find(it)?.groupValues?.get(1) }
-        } catch (ex: Exception) {
-            logger.error(ex) { "Error while getting TeslaMate instance version." }
-            null
         }
+            .onErr { ex -> logger.error(ex) { "Error while getting TeslaMate instance version." } }
+            .get()
     }
 
     private suspend fun getLatestVersion(): String? {
-        return try {
+        return runSuspendCatching {
             githubApiClient
                 .get("https://api.github.com/repos/teslamate-org/teslamate/releases/latest")
                 .body<GitHubReleasesLatestResponse>()
                 .name.drop(1)  // Drop "v" from "vX.Y.Z".
-        } catch (ex: Exception) {
-            logger.error(ex) { "Error while getting TeslaMate latest version from GitHub." }
-            null
         }
+            .onErr { ex -> logger.error(ex) { "Error while getting TeslaMate latest version from GitHub." } }
+            .get()
     }
 
     private val httpRawTextClient = HttpClient(CIO) {

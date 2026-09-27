@@ -62,7 +62,7 @@ class IncidentService(
             .onErr { logger.warn { "Could not persist active incidents cache ($it)." } }
     }
 
-    // TODO: Sending notifications should not just log, but olso retry.
+    // TODO: Sending notifications should not just log, but also retry.
     private fun logNotificationFailure(incident: Incident, error: DiscordError) {
         logger.warn { "Could not send notification for incident ${incident.id} (check ${incident.checkId.value}): $error." }
     }

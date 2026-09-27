@@ -1,5 +1,6 @@
 package xyz.deseteral.jaruga.ranger.campground.utils
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -9,6 +10,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
+
+private val logger = KotlinLogging.logger {}
 
 class PeriodicallyComputedValue<T>(
     private val period: Duration,
@@ -30,7 +33,8 @@ class PeriodicallyComputedValue<T>(
                 state.value = compute()
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
+            } catch (ex: Exception) {
+                logger.warn(ex) { "Periodically computed value computation failed. Keeping last value." }
             }
             delay(period)
         }

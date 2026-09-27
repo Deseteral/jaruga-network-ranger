@@ -1,5 +1,8 @@
 package xyz.deseteral.jaruga.ranger.campground.external
 
+import com.github.michaelbull.result.coroutines.runSuspendCatching
+import com.github.michaelbull.result.get
+import com.github.michaelbull.result.onErr
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -7,6 +10,8 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.http.URLBuilder
+import io.ktor.http.appendPathSegments
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -38,15 +43,18 @@ class HomeAssistantClient(
     }
 
     private suspend fun getAllStates(): List<HomeAssistantState>? {
-        return try {
+        return runSuspendCatching {
             httpClient
-                .get("${config.instanceUrl}/api/states") { bearerAuth(config.accessToken) }
-                .body()
-        } catch (ex: Exception) {
-            logger.error(ex) { "Error while getting HomeAssistant states." }
-            null
+                .get(urlApiStates) { bearerAuth(config.accessToken) }
+                .body<List<HomeAssistantState>>()
         }
+            .onErr { ex -> logger.error(ex) { "Error while getting HomeAssistant states." } }
+            .get()
     }
+
+    private val urlApiStates = URLBuilder(config.instanceUrl).apply {
+        appendPathSegments("api", "states")
+    }.toString()
 
     @Serializable
     private data class HomeAssistantState(
