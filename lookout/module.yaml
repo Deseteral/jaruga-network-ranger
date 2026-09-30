@@ -11,8 +11,6 @@ settings:
 
 dependencies:
   - ../trail
-  - com.michael-bull.kotlin-result:kotlin-result:2.3.1
-  - com.michael-bull.kotlin-result:kotlin-result-coroutines:2.3.1
   - org.jetbrains.kotlinx:kotlinx-datetime:0.8.0
   - org.jetbrains.kotlinx:kotlinx-io-core:0.9.1
   - $ktor.server.core
@@ -23,6 +21,9 @@ dependencies:
   - $ktor.client.contentNegotiation
   - ch.qos.logback:logback-classic:1.5.18
   - io.github.oshai:kotlin-logging-jvm:8.0.4
+  - com.michael-bull.kotlin-result:kotlin-result:2.3.1
+  - com.michael-bull.kotlin-result:kotlin-result-coroutines:2.3.1
+  - com.michael-bull.kotlin-retry:kotlin-retry-result:2.0.2
 
 test-dependencies:
   - $ktor.server.testHost

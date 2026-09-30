@@ -15,7 +15,12 @@ data class LookoutConfig(
 
     data class Notifier(
         val process: (incident: Incident) -> NotificationChannel,
-    )
+        val retryPolicy: RetryPolicy,
+    ) {
+        data class RetryPolicy(
+            val maxAttempts: Int = 3,
+        )
+    }
 
     sealed class NotificationChannel {
         data class DiscordWebhook(

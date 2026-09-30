@@ -12,6 +12,9 @@ LookoutConfig(
     ),
     bufferSize = 12,
     notifier = LookoutConfig.Notifier(
+        retryPolicy = LookoutConfig.Notifier.RetryPolicy(
+            maxAttempts = 3,
+        ),
         process = { incident ->
             when (incident.severity) {
                 CheckResult.Severity.MAJOR -> discordTestMajor
