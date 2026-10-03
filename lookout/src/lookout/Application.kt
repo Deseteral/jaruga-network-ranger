@@ -23,6 +23,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
     val dataDirectoryPath = Path(environment.config.property("lookout.data_path").getString())
+        .also { check(SystemFileSystem.metadataOrNull(it)?.isDirectory == true) { "Data path is not a directory: $it." } }
     val config = loadLookoutConfig(Path(dataDirectoryPath, "config.lookout.kts"))
 
     install(ContentNegotiation) {
