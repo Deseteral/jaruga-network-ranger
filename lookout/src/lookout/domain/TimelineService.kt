@@ -131,7 +131,9 @@ class TimelineService(
     data class TimelinesUpdateDiff(
         val degraded: Set<CheckId>,
         val healed: Set<CheckId>,
-    )
+    ) {
+        val isDirty: Boolean = degraded.isNotEmpty() || healed.isNotEmpty()
+    }
 
     companion object {
         val ALL_CHECKS_UNKNOWN_STATE_ID = CheckId("All checks in unknown state")

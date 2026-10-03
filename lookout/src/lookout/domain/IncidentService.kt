@@ -58,8 +58,10 @@ class IncidentService(
                 .onErr { error -> logNotificationFailure(resolvedIncident, error) }
         }
 
-        activeIncidentsCache.write(activeIncidents)
-            .onErr { logger.warn { "Could not persist active incidents cache ($it)." } }
+        if (diff.isDirty) {
+            activeIncidentsCache.write(activeIncidents)
+                .onErr { logger.warn { "Could not persist active incidents cache ($it)." } }
+        }
     }
 
     private fun logNotificationFailure(incident: Incident, error: DiscordError) {
