@@ -14,7 +14,7 @@ class NotificationService(
 ) {
     private val retryPolicy =
         binaryExponentialBackoff<DiscordError>(min = 100, max = 10_000) +
-            stopAtAttempts(config.maxAttempts)
+            stopAtAttempts(config.retryPolicy.maxAttempts)
 
     suspend fun sendNotification(incident: Incident): Result<Unit, DiscordError> {
         return when (val notification = config.process(incident)) {
