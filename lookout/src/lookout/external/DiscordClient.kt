@@ -64,10 +64,8 @@ class DiscordClient : DiscordRepository {
             httpClient.post(url) {
                 contentType(ContentType.Application.Json)
                 setBody(DiscordWebhookRequestBody(embeds))
-            }
+            }.body<DiscordWebhookResponseBody>().id
         }
-            .map { response -> response.body<DiscordWebhookResponseBody>() }
-            .map { body -> body.id }
             .onErr { ex -> logger.error(ex) { "Discord webhook message creation failed." } }
             .mapError { DiscordError.WebhookFailed }
     }
