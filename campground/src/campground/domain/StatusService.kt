@@ -12,6 +12,7 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,21 +41,39 @@ class StatusService(
 
         // Evaluate checks.
         checks.associate { check ->
-            logger.info { "Evaluating check \"${check.name}\"." }
-            CheckId(check.name) to CheckResult(
-                severity = when (check.severity(ctx)) {
-                    CampgroundConfig.CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
-                    CampgroundConfig.CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
-                },
-                state = if (check.isFailure(ctx) ?: true) {
-                    CheckResult.State.FAILURE
-                } else {
-                    CheckResult.State.SUCCESS
-                },
-                description = check.description?.let { it(ctx) },
-                timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
-            )
+            logger.info { "Evaluating check definition \"${check.name}\"." }
+            val result = try {
+                evaluateCheckDefinition(check, ctx, timestamp)
+            } catch (ex: Exception) {
+                CheckResult(
+                    description = "Possible configuration error in Campground, while evaluating check definition \"${check.name}\".",
+                    state = CheckResult.State.FAILURE,
+                    severity = CheckResult.Severity.MAJOR,
+                    timestamp = timestamp,
+                ).also { logger.error(ex) { "Error while evaluating check definition \"${check.name}\"." } }
+            }
+            CheckId(check.name) to result
         }.let { checks -> SystemStatus(checks) }
+    }
+
+    private fun evaluateCheckDefinition(
+        check: CampgroundConfig.CheckDefinition,
+        ctx: CampgroundContext,
+        timestamp: Instant,
+    ): CheckResult {
+        return CheckResult(
+            severity = when (check.severity(ctx)) {
+                CampgroundConfig.CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
+                CampgroundConfig.CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
+            },
+            state = if (check.isFailure(ctx) ?: true) {
+                CheckResult.State.FAILURE
+            } else {
+                CheckResult.State.SUCCESS
+            },
+            description = check.description?.let { it(ctx) },
+            timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
+        )
     }
 }
 
