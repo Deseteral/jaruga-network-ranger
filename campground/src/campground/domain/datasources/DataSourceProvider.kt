@@ -1,10 +1,12 @@
 package xyz.deseteral.jaruga.ranger.campground.domain.datasources
 
-class DataSourceProvider<DataSourceT, ProviderT>(
+import java.util.concurrent.ConcurrentHashMap
+
+class DataSourceProvider<DataSourceT : Any, ProviderT : Any>(
     private val provide: (dataSource: DataSourceT) -> ProviderT,
 ) {
-    private val cache: MutableMap<DataSourceT, ProviderT> = mutableMapOf()
+    private val cache = ConcurrentHashMap<DataSourceT, ProviderT>()
 
     fun of(dataSource: DataSourceT): ProviderT =
-        cache.getOrPut(dataSource) { provide(dataSource) }
+        cache.computeIfAbsent(dataSource) { provide(it) }
 }
