@@ -4,6 +4,8 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.SUCCESS
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemChecks.ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemChecks.allChecksInUnknownStateResult
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Clock
 
@@ -77,7 +79,7 @@ class TimelineService(
         }
 
         systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
-            allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE),
+            allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE, timestamp = clock.now()),
         )
 
         return Snapshot(
@@ -93,23 +95,11 @@ class TimelineService(
     private fun emptyTimeline(): Timeline =
         ArrayDeque(List(timelineSize) { null })
 
-    // TODO: Extract along with corresponding ID.
-    private fun allChecksInUnknownStateResult(state: CheckResult.State) = CheckResult(
-        state = state,
-        severity = CheckResult.Severity.MAJOR,
-        timestamp = clock.now(),
-        description = "Could not acquire system status update. All checks are in unknown state. Check Campground instance.",
-    )
-
     data class Snapshot(
         val latest: Map<CheckId, CheckResult?>,
         val absent: Set<CheckId>,
         val isCampgroundReachable: Boolean,
     )
-
-    companion object {
-        val ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID = CheckId("All checks in unknown state")
-    }
 }
 
 private typealias Timeline = ArrayDeque<CheckResult?>

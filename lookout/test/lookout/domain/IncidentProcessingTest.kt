@@ -12,7 +12,6 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.io.files.Path
-import xyz.deseteral.jaruga.ranger.lookout.domain.TimelineService.Companion.ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID
 import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
@@ -20,6 +19,7 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.Severity.MAJOR
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.SUCCESS
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
+import xyz.deseteral.jaruga.ranger.trail.domain.SystemChecks.ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Clock
 import kotlin.time.Instant
