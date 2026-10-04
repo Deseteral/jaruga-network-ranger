@@ -53,6 +53,9 @@ class IncidentService(
     fun isIncidentOpenForCheck(checkId: CheckId): Boolean =
         activeIncidents.containsKey(checkId)
 
+    fun getActiveIncidents(): Map<CheckId, Incident> =
+        activeIncidents.toMap()
+
     private suspend fun openIncident(checkId: CheckId, checkResult: CheckResult) {
         val incident = Incident(
             checkId = checkId,

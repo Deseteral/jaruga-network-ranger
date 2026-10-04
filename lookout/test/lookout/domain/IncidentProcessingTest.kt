@@ -414,6 +414,22 @@ class IncidentProcessingTest : FunSpec(
                 fixture.incidentCache.writeCount shouldBe 1
             }
         }
+
+        context("probe health") {
+            test("last successful probe time is set") {
+                // given
+                val fixture = Fixture().apply {
+                    campground.updates = listOf(healthyStatus(T1))
+                }
+                fixture.probeService.lastSuccessfulProbeAt shouldBe null
+
+                // when
+                fixture.probeService.performSingleProbe()
+
+                // then
+                fixture.probeService.lastSuccessfulProbeAt shouldBe CLOCK_TIME
+            }
+        }
     },
 )
 
@@ -439,6 +455,7 @@ private class Fixture(
             activeIncidentsCache = incidentCache,
             clock = FixedClock(CLOCK_TIME),
         ),
+        clock = FixedClock(CLOCK_TIME),
     )
 }
 

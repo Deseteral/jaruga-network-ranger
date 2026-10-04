@@ -48,6 +48,7 @@ fun Application.module() {
         campgroundRepository = campgroundClient,
         timelineService = timelineService,
         incidentService = incidentService,
+        clock = Clock.System,
     )
 
     launch {
@@ -55,6 +56,6 @@ fun Application.module() {
     }
 
     routing {
-        statusEndpoint(timelineService)
+        statusEndpoint(timelineService, probeService, incidentService)
     }
 }
