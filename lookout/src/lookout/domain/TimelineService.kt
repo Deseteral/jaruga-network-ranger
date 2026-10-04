@@ -76,9 +76,6 @@ class TimelineService(
             allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE),
         )
 
-        // TODO: Remove.
-        debugPrint()
-
         return generateTimelinesDiff()
     }
 
@@ -104,22 +101,6 @@ class TimelineService(
         timestamp = clock.now(),
         description = "Could not acquire system status update. All checks are in unknown state. Check Campground instance.",
     )
-
-    // TODO: Remove.
-    private fun debugPrint() {
-        val statusToChar = { s: CheckResult.State? ->
-            when (s) {
-                SUCCESS -> '1'
-                FAILURE -> '0'
-                null -> '.'
-            }
-        }
-
-        allChecks.forEach { (id, timeline) ->
-            println("${id.value.padEnd(50, ' ')} | ${timeline.map { statusToChar(it?.state) }.joinToString("")}")
-        }
-        println("")
-    }
 
     /**
      * Describes the outcome of system status update processing.
