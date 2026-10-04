@@ -23,7 +23,7 @@ class TimelineService(
     private val userDefinedChecks: MutableMap<CheckId, Timeline> = mutableMapOf()
 
     private val systemChecks: Map<CheckId, Timeline> = mapOf(
-        ALL_CHECKS_UNKNOWN_STATE_ID to emptyTimeline(),
+        ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID to emptyTimeline(),
     )
 
     private val allChecks: Map<CheckId, Timeline>
@@ -72,7 +72,7 @@ class TimelineService(
             insertLatestAllFailsForExistingChecks()
         }
 
-        systemChecks[ALL_CHECKS_UNKNOWN_STATE_ID]?.insertLatestCheck(
+        systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
             allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE),
         )
 
@@ -136,7 +136,7 @@ class TimelineService(
     }
 
     companion object {
-        val ALL_CHECKS_UNKNOWN_STATE_ID = CheckId("All checks in unknown state")
+        val ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID = CheckId("All checks in unknown state")
     }
 }
 
