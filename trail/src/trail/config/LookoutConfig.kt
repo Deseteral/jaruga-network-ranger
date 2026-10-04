@@ -1,6 +1,7 @@
 package xyz.deseteral.jaruga.ranger.trail.config
 
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
+import java.net.URI
 import kotlin.time.Duration
 
 data class LookoutConfig(
@@ -8,6 +9,15 @@ data class LookoutConfig(
     val bufferSize: Int,
     val notifier: Notifier,
 ) {
+    init {
+        require(campground.interval > Duration.ZERO) {
+            "Campground interval must be positive, but is ${campground.interval}."
+        }
+        require(notifier.retryPolicy.maxAttempts >= 1) {
+            "Notifier max attempts must be at least 1, but is ${notifier.retryPolicy.maxAttempts}."
+        }
+    }
+
     data class Campground(
         val instanceUrl: String,
         val interval: Duration,
@@ -24,8 +34,19 @@ data class LookoutConfig(
 
     sealed class NotificationChannel {
         data class DiscordWebhook(
-            // TODO: Validate URL can parse and are correct.
             val url: String,
-        ) : NotificationChannel()
+        ) : NotificationChannel() {
+            init {
+                require(url.isValidUrl()) {
+                    "Discord webhook URL must be valid."
+                }
+            }
+        }
     }
+}
+
+private fun String.isValidUrl(): Boolean = try {
+    URI(this).let { it.scheme != null && it.host != null }
+} catch (_: Exception) {
+    false
 }
