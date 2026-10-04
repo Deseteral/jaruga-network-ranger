@@ -35,7 +35,6 @@ fun Application.module() {
     val discordClient = DiscordClient()
     val notificationService = NotificationService(discordClient, config.notifier)
     val incidentService = IncidentService(
-        timelineService = timelineService,
         notificationService = notificationService,
         activeIncidentsCache = FilePersistentCache.json(
             name = "active-incidents",
@@ -43,6 +42,7 @@ fun Application.module() {
             fileSystem = SystemFileSystem,
             format = true,
         ),
+        clock = Clock.System,
     )
     val probeService = ProbeService(
         campgroundRepository = campgroundClient,

@@ -47,12 +47,14 @@ class TimelineService(
      * Inserts new timeline entry for all known checks (both user defined and system checks).
      * If new update couldn't be obtained, then [[systemStatusUpdate]] should be null.
      *
-     * Return [TimelinesUpdateDiff] which indicates changes in the system after the update was processed.
+     * Returns [Snapshot] which describes the current state of all known checks after the update was processed.
      */
-    fun insertLatest(systemStatusUpdate: SystemStatus?): TimelinesUpdateDiff {
+    fun insertLatest(systemStatusUpdate: SystemStatus?): Snapshot {
         // systemStatus is null when we could not connect to Campground.
         // When that happens all existing known checks should be failed.
         val isSuccessfulUpdate = systemStatusUpdate != null
+
+        val missingInUpdate: Set<CheckId>
 
         if (isSuccessfulUpdate) {
             // Process all checks in update.
@@ -62,31 +64,28 @@ class TimelineService(
                     .insertLatestCheck(check)
             }
 
+            missingInUpdate = userDefinedChecks.keys.toSet() - systemStatusUpdate.checks.keys.toSet()
+
             // When update does not contain checks that were previously known, set their latest state to unknown (null).
-            val missingInUpdate = userDefinedChecks.keys.toSet() - systemStatusUpdate.checks.keys.toSet()
             missingInUpdate.forEach { checkId ->
                 userDefinedChecks.getOrPut(checkId) { emptyTimeline() }
                     .insertLatestCheck(null)
             }
         } else {
             insertLatestAllFailsForExistingChecks()
+            missingInUpdate = emptySet()
         }
 
         systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
             allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE),
         )
 
-        return generateTimelinesDiff()
+        return Snapshot(
+            latest = allChecks.mapValues { (_, timeline) -> timeline.firstOrNull() },
+            absent = missingInUpdate,
+            isCampgroundReachable = isSuccessfulUpdate,
+        )
     }
-
-    private fun generateTimelinesDiff() = TimelinesUpdateDiff(
-        degraded = allChecks.queryForCheckIdsWhere { current, previous ->
-            current?.state == FAILURE && (previous?.state == SUCCESS || previous == null)
-        },
-        healed = allChecks.queryForCheckIdsWhere { current, previous ->
-            current?.state == SUCCESS && previous?.state == FAILURE
-        },
-    )
 
     private fun insertLatestAllFailsForExistingChecks() =
         userDefinedChecks.values.forEach { it.insertLatestCheck(null) }
@@ -102,19 +101,11 @@ class TimelineService(
         description = "Could not acquire system status update. All checks are in unknown state. Check Campground instance.",
     )
 
-    /**
-     * Describes the outcome of system status update processing.
-     * [CheckId] contained in the sets indicate the states of which checks changed during the update.
-     *
-     * [degraded] indicates checks that failed after this update, which have not failed before.
-     * [healed] indicates checks that succeed after this update, which have been failed before.
-     */
-    data class TimelinesUpdateDiff(
-        val degraded: Set<CheckId>,
-        val healed: Set<CheckId>,
-    ) {
-        val isDirty: Boolean = degraded.isNotEmpty() || healed.isNotEmpty()
-    }
+    data class Snapshot(
+        val latest: Map<CheckId, CheckResult?>,
+        val absent: Set<CheckId>,
+        val isCampgroundReachable: Boolean,
+    )
 
     companion object {
         val ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID = CheckId("All checks in unknown state")
@@ -127,9 +118,3 @@ private fun Timeline.insertLatestCheck(check: CheckResult?) {
     removeLast()
     addFirst(check)
 }
-
-private fun Map<CheckId, Timeline>.queryForCheckIdsWhere(predicate: (current: CheckResult?, previous: CheckResult?) -> Boolean): Set<CheckId> =
-    filter { (_, timeline) ->
-        val (current, previous) = timeline
-        predicate(current, previous)
-    }.map { (checkId, _) -> checkId }.toSet()

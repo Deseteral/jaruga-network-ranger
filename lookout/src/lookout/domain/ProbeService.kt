@@ -14,10 +14,10 @@ class ProbeService(
     private val timelineService: TimelineService,
     private val incidentService: IncidentService,
 ) {
-    private suspend fun performSingleProbe() {
+    suspend fun performSingleProbe() {
         campgroundRepository.getSystemStatusUpdates().collect { systemStatusUpdates ->
-            val diff = timelineService.insertLatest(systemStatusUpdates)
-            incidentService.processTimelineDiff(diff)
+            val snapshot = timelineService.insertLatest(systemStatusUpdates)
+            incidentService.reconcile(snapshot)
         }
     }
 
