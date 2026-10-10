@@ -11,7 +11,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendPathSegments
@@ -51,7 +50,7 @@ class TeslaMateClient(
 
         return runSuspendCatching {
             httpRawTextClient
-                .get(url) { expectSuccess = true }
+                .get(url)
                 .body<String>()
                 .replace(" ", "").replace("\n", "")
                 .let { VERSION_FROM_HTML_REGEX.find(it)?.groupValues?.get(1) }

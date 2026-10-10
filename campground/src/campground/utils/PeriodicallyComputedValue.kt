@@ -39,8 +39,4 @@ class PeriodicallyComputedValue<T>(
             delay(period)
         }
     }
-
-    fun stop() {
-        job.cancel()
-    }
 }
