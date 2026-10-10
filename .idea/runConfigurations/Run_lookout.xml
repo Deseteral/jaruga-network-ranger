@@ -1,6 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run lookout" type="Amper.Run">
     <option name="command" value="run" />
+    <envs>
+      <env name="LOOKOUT_DATA_PATH" value="dev-data" />
+    </envs>
     <EXTENSION ID="amper.run.common">
       <option name="module" value="lookout" />
     </EXTENSION>

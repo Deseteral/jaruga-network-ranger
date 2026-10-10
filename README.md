@@ -21,8 +21,8 @@ when the service starts. Any config issues prevent the respective services from 
 | Variable               | Function                          | Default                               |
 |------------------------|-----------------------------------|---------------------------------------|
 | `PORT`                 | The HTTP port for the service.    | 8080 for Campground, 8081 for Lookout |
-| `CAMPGROUND_DATA_PATH` | The data directory of Campground. | `dev-data`                            |
-| `LOOKOUT_DATA_PATH`    | The data directory of Lookout.    | `dev-data`                            |
+| `CAMPGROUND_DATA_PATH` | The data directory of Campground. | `data`                                |
+| `LOOKOUT_DATA_PATH`    | The data directory of Lookout.    | `data`                                |
 
 The data directory is used to keep the user configuration and files required by the services for
 their normal operation.
