@@ -1,8 +1,8 @@
 package xyz.deseteral.jaruga.ranger.trail.domain
 
 data class CampgroundContext(
-    val hass: Map<String, Hass?> = mutableMapOf(),
-    val teslaMate: Map<String, TeslaMate?> = mutableMapOf(),
+    val hass: Map<String, Hass?> = emptyMap(),
+    val teslaMate: Map<String, TeslaMate?> = emptyMap(),
 ) {
     data class Hass(
         val states: List<EntityState>,

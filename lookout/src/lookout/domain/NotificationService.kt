@@ -9,8 +9,8 @@ import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 
 class NotificationService(
-    val discordRepository: DiscordRepository,
-    val config: LookoutConfig.Notifier,
+    private val discordRepository: DiscordRepository,
+    private val config: LookoutConfig.Notifier,
 ) {
     private val retryPolicy =
         binaryExponentialBackoff<DiscordError>(min = 100, max = 10_000) +
