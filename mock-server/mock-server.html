@@ -42,8 +42,8 @@
 <body>
 <div id="mock-state" hx-get="/ui/state" hx-trigger="load" hx-swap="outerHTML"></div>
 
-<fieldset id="lookout-status" hx-get="/ui/lookout/status" hx-trigger="load, every 1s"
-          hx-target="#lookout-status" hx-swap="outerHTML">
+<fieldset id="lookout-firewatch" hx-get="/ui/lookout/firewatch" hx-trigger="load, every 1s"
+          hx-target="#lookout-firewatch" hx-swap="outerHTML">
   <legend>Lookout check timelines</legend>
 </fieldset>
 </body>
@@ -164,10 +164,11 @@
   </tr>
 </template>
 
-<template id="lookout-status">
-  <fieldset id="lookout-status" hx-get="/ui/lookout/status" hx-trigger="every 1s"
-            hx-target="#lookout-status" hx-swap="outerHTML">
+<template id="lookout-firewatch">
+  <fieldset id="lookout-firewatch" hx-get="/ui/lookout/firewatch" hx-trigger="every 1s"
+            hx-target="#lookout-firewatch" hx-swap="outerHTML">
     <legend>Lookout check timelines</legend>
+    Is system degraded: {{degraded}}
     <table>
       <thead>
       <tr>
@@ -189,7 +190,7 @@
   </tr>
 </template>
 
-<template id="lookout-status-message-row">
+<template id="lookout-firewatch-message-row">
   <tr>
     <td colspan="2">{{message}}</td>
   </tr>

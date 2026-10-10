@@ -23,8 +23,9 @@ interface LookoutCheckResult {
   timestamp: string;
 }
 
-interface LookoutStatus {
+interface LookoutFirewatch {
   checks: Record<string, (LookoutCheckResult | null)[]>;
+  degraded: boolean;
 }
 
 interface MockState {
@@ -202,12 +203,16 @@ async function handleUiFault(req: IncomingMessage, res: ServerResponse, rawSourc
 
 async function handleUiLookoutStatus(res: ServerResponse): Promise<void> {
   let timelineRows: string;
+  let degraded = "unknown";
   try {
-    timelineRows = renderTimelineRows(await fetchLookoutStatus());
+    const firewatch = await fetchLookoutStatus();
+    console.log("firewatch", firewatch);
+    timelineRows = renderTimelineRows(firewatch);
+    degraded = firewatch.degraded ? "yes" : "no";
   } catch (ex: unknown) {
     timelineRows = renderMessageRow(`Could not reach lookout: ${ex instanceof Error ? ex.message : String(ex)}`);
   }
-  send(res, 200, renderTemplate("lookout-status", {timelineRows}), "text/html; charset=utf-8");
+  send(res, 200, renderTemplate("lookout-firewatch", {timelineRows, degraded}), "text/html; charset=utf-8");
 }
 
 // --- Web UI ------------------------------------------------------------------
@@ -257,17 +262,17 @@ const CHECK_STATE_SYMBOLS: Record<LookoutCheckState | "unknown", string> = {
   unknown: "•",
 };
 
-async function fetchLookoutStatus(): Promise<LookoutStatus> {
-  const response = await fetch(new URL("/status", LOOKOUT_URL));
+async function fetchLookoutStatus(): Promise<LookoutFirewatch> {
+  const response = await fetch(new URL("/firewatch", LOOKOUT_URL));
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return (await response.json()) as LookoutStatus;
+  return (await response.json()) as LookoutFirewatch;
 }
 
 function renderMessageRow(message: string): string {
-  return renderTemplate("lookout-status-message-row", {message: escapeHtml(message)});
+  return renderTemplate("lookout-firewatch-message-row", {message: escapeHtml(message)});
 }
 
-function renderTimelineRows(status: LookoutStatus): string {
+function renderTimelineRows(status: LookoutFirewatch): string {
   const checks = Object.entries(status.checks);
   if (checks.length === 0) return renderMessageRow("No checks known to Lookout yet.");
   return checks
@@ -295,7 +300,7 @@ async function route(req: IncomingMessage, res: ServerResponse): Promise<void> {
     return;
   }
 
-  if (req.method === "GET" && path === "/ui/lookout/status") {
+  if (req.method === "GET" && path === "/ui/lookout/firewatch") {
     await handleUiLookoutStatus(res);
     return;
   }
