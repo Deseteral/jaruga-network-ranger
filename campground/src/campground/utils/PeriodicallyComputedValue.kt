@@ -2,6 +2,7 @@ package xyz.deseteral.jaruga.ranger.campground.utils
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,14 +21,17 @@ class PeriodicallyComputedValue<T>(
 ) {
     private val state = MutableStateFlow<T?>(null)
 
+    /**
+     * The current value, or null if it has not been computed yet.
+     */
     val value: T?
-        get() = state.value
+        get() = state.value.also { job.start() }
 
     init {
         require(period > Duration.ZERO) { "Period must be positive." }
     }
 
-    private val job: Job = scope.launch {
+    private val job: Job = scope.launch(start = CoroutineStart.LAZY) {
         while (isActive) {
             try {
                 state.value = compute()
