@@ -8,6 +8,7 @@ This system consists of two services:
 - `Lookout` reads the Campground status, tracks incidents, and sends notifications.
 
 You should run `Campground` inside your homelab, where it can freely access services it must monitor.
+
 Host `Lookout` outside your homelab (for example, on a VPS) to prevent network problems from stopping
 incident notifications.
 
