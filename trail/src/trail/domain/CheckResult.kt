@@ -36,6 +36,9 @@ object SystemChecks {
         state = state,
         severity = CheckResult.Severity.MAJOR,
         timestamp = timestamp,
-        description = "Could not acquire system status update. All checks are in unknown state. Check Campground instance.",
+        description = when (state) {
+            CheckResult.State.FAILURE -> "Could not acquire system status update. All checks are in unknown state. Check Campground instance."
+            CheckResult.State.SUCCESS -> null
+        },
     )
 }

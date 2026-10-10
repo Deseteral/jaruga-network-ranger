@@ -83,7 +83,7 @@ class TimelineService(
                 missingInUpdate = emptySet()
             }
 
-            systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
+            systemChecks.getValue(ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID).insertLatestCheck(
                 allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE, timestamp = clock.now()),
             )
 
