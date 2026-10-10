@@ -1,6 +1,7 @@
 package xyz.deseteral.jaruga.ranger.trail.config
 
 import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemChecks.RESERVED_CHECK_NAMES
 
 data class CampgroundConfig(
@@ -51,17 +52,12 @@ data class CampgroundConfig(
         /**
          * Based on data used to decide this check's health, what is the severity of this check.
          */
-        val severity: (ctx: CampgroundContext) -> Severity,
+        val severity: (ctx: CampgroundContext) -> CheckResult.Severity,
 
         /**
          * Should this check fail. Return false to make this check as healthy.
          * Returning null will make this check fail.
          */
         val isFailure: (ctx: CampgroundContext) -> Boolean?,
-    ) {
-        enum class Severity {
-            MAJOR,
-            MINOR,
-        }
-    }
+    )
 }

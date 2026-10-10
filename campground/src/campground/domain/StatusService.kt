@@ -67,10 +67,7 @@ class StatusService(
         timestamp: Instant,
     ): CheckResult {
         return CheckResult(
-            severity = when (check.severity(ctx)) {
-                CampgroundConfig.CheckDefinition.Severity.MAJOR -> CheckResult.Severity.MAJOR
-                CampgroundConfig.CheckDefinition.Severity.MINOR -> CheckResult.Severity.MINOR
-            },
+            severity = check.severity(ctx),
             state = if (check.isFailure(ctx) ?: true) {
                 CheckResult.State.FAILURE
             } else {

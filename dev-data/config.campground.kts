@@ -1,4 +1,5 @@
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
+import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 
 CampgroundConfig(
     sources = mapOf(
@@ -15,12 +16,12 @@ CampgroundConfig(
             name = "HomeAssistant has update available",
             isFailure = { ctx -> ctx.hass["ha"]?.states?.any { it.canBeUpdated } },
             description = { ctx -> "${ctx.hass["ha"]?.states?.count { it.canBeUpdated }} updates available." },
-            severity = { CampgroundConfig.CheckDefinition.Severity.MINOR },
+            severity = { CheckResult.Severity.MINOR },
         ),
         CampgroundConfig.CheckDefinition(
             name = "TeslaMate has update available",
             isFailure = { ctx -> ctx.teslaMate["tm"]?.isUpdateAvailable },
-            severity = { CampgroundConfig.CheckDefinition.Severity.MAJOR },
+            severity = { CheckResult.Severity.MAJOR },
         ),
     ),
 )
