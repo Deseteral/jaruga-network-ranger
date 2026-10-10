@@ -8,7 +8,7 @@ import io.ktor.server.routing.routing
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import xyz.deseteral.jaruga.ranger.lookout.api.statusEndpoint
+import xyz.deseteral.jaruga.ranger.lookout.api.firewatchEndpoint
 import xyz.deseteral.jaruga.ranger.lookout.domain.IncidentService
 import xyz.deseteral.jaruga.ranger.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.ranger.lookout.domain.ProbeService
@@ -56,6 +56,6 @@ fun Application.module() {
     }
 
     routing {
-        statusEndpoint(timelineService, probeService, incidentService)
+        firewatchEndpoint(timelineService, probeService, incidentService)
     }
 }

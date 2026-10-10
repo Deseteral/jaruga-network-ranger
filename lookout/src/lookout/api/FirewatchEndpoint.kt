@@ -11,31 +11,36 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 import kotlin.time.Instant
 
-fun Routing.statusEndpoint(
+fun Routing.firewatchEndpoint(
     timelineService: TimelineService,
     probeService: ProbeService,
     incidentService: IncidentService,
 ) {
-    get("/status") {
+    get("/firewatch") {
         val checks = timelineService.getCheckTimelines()
             .mapKeys { (checkId, _) -> checkId.value }
             .mapValues { (_, timeline) -> timeline.toList() }
+
         val activeIncidents = incidentService.getActiveIncidents()
             .mapKeys { (checkId, _) -> checkId.value }
 
+        val degraded = activeIncidents.isNotEmpty()
+
         call.respond(
-            StatusResponse(
+            FirewatchResponse(
                 lastSuccessfulProbeAt = probeService.lastSuccessfulProbeAt,
                 checks = checks,
                 activeIncidents = activeIncidents,
+                degraded,
             ),
         )
     }
 }
 
 @Serializable
-private data class StatusResponse(
+private data class FirewatchResponse(
     val lastSuccessfulProbeAt: Instant?,
     val checks: Map<String, List<CheckResult?>>,
     val activeIncidents: Map<String, Incident>,
+    val degraded: Boolean,
 )
