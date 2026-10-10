@@ -46,7 +46,7 @@ class StatusService(
 
         // Evaluate checks.
         checks.associate { check ->
-            logger.info { "Evaluating check definition \"${check.name}\"." }
+            logger.debug { "Evaluating check definition \"${check.name}\"." }
             val result = try {
                 evaluateCheckDefinition(check, ctx, timestamp)
             } catch (ex: Exception) {
