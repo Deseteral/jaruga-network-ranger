@@ -94,3 +94,7 @@ There is a simple admin UI at <http://localhost:9930>.
 cd mock-server
 bun mock-server.ts
 ```
+
+## License
+
+This project is licensed under the [MIT license](LICENSE).
