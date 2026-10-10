@@ -9,6 +9,7 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.FAILURE
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult.State.SUCCESS
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -21,7 +22,7 @@ class IncidentService(
 ) {
 
     private val activeIncidents: MutableMap<CheckId, Incident> =
-        activeIncidentsCache.read { mutableMapOf() }.getOrElse { mutableMapOf() }
+        ConcurrentHashMap(activeIncidentsCache.read { mutableMapOf() }.getOrElse { mutableMapOf() })
     private val resolvedIncidents: MutableList<Incident> = mutableListOf()
 
     private var isActiveIncidentsCacheDirty = false
