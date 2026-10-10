@@ -1,6 +1,7 @@
 package xyz.deseteral.jaruga.ranger.trail.loader
 
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
 import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import java.io.File
@@ -24,11 +25,12 @@ private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(
     configurationType: KClass<T>,
     path: Path,
 ): T {
-    val file = File(path.toString())
-    require(file.isFile) { "Configuration script does not exist: ${file.absolutePath}" }
+    require(SystemFileSystem.metadataOrNull(path)?.isRegularFile == true) {
+        "Configuration script does not exist: $path"
+    }
 
     val classLoader = Thread.currentThread().contextClassLoader
-    val script = file.toScriptSource()
+    val script = File(path.toString()).toScriptSource()
     val compilationConfiguration = createJvmCompilationConfigurationFromTemplate<ScriptConfigT>()
     val evaluationConfiguration = createJvmEvaluationConfigurationFromTemplate<ScriptConfigT> {
         jvm {
@@ -42,7 +44,7 @@ private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(
         is ResultWithDiagnostics.Failure -> {
             val diagnostics = result.reports.joinToString("\n") { report -> "${report.severity}: ${report.message}" }
             throw IllegalArgumentException(
-                "Could not compile configuration script ${file.absolutePath}:\n$diagnostics",
+                "Could not compile configuration script $path:\n$diagnostics",
             )
         }
 
@@ -59,7 +61,7 @@ private inline fun <T : Any, reified ScriptConfigT : Any> loadUserConfiguration(
         }
 
         is ResultValue.Error -> throw IllegalArgumentException(
-            "Could not evaluate configuration script ${file.absolutePath}.",
+            "Could not evaluate configuration script $path.",
             returnValue.error,
         )
 
