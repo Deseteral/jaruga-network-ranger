@@ -31,18 +31,22 @@ class TimelineService(
     private val allChecks: Map<CheckId, Timeline>
         get() = systemChecks + userDefinedChecks
 
+    private val internalStateLock = Any()
+
     /**
      * Returns timelines of all known checks.
      */
-    fun getCheckTimelines(): Map<CheckId, Timeline> =
-        allChecks
+    fun getCheckTimelines(): Map<CheckId, Timeline> = synchronized(internalStateLock) {
+        allChecks.mapValues { (_, timeline) -> ArrayDeque(timeline) }
+    }
 
     /**
      * Returns latest [CheckResult] for given [CheckId].
      * Returns null if given ID is not recorded or the check's state is unknown.
      */
-    fun getCheckResult(id: CheckId): CheckResult? =
+    fun getCheckResult(id: CheckId): CheckResult? = synchronized(internalStateLock) {
         (userDefinedChecks[id] ?: systemChecks[id])?.firstOrNull()
+    }
 
     /**
      * Process latest system update.
@@ -52,41 +56,43 @@ class TimelineService(
      * Returns [Snapshot] which describes the current state of all known checks after the update was processed.
      */
     fun insertLatest(systemStatusUpdate: SystemStatus?): Snapshot {
-        // systemStatus is null when we could not connect to Campground.
-        // When that happens all existing known checks should be failed.
-        val isSuccessfulUpdate = systemStatusUpdate != null
+        synchronized(internalStateLock) {
+            // systemStatus is null when we could not connect to Campground.
+            // When that happens all existing known checks should be failed.
+            val isSuccessfulUpdate = systemStatusUpdate != null
 
-        val missingInUpdate: Set<CheckId>
+            val missingInUpdate: Set<CheckId>
 
-        if (isSuccessfulUpdate) {
-            // Process all checks in update.
-            // When update contains new check - add it with timeline full of unknown (null) values and process latest update state.
-            systemStatusUpdate.checks.forEach { (checkId, check) ->
-                userDefinedChecks.getOrPut(checkId) { emptyTimeline() }
-                    .insertLatestCheck(check)
+            if (isSuccessfulUpdate) {
+                // Process all checks in update.
+                // When update contains new check - add it with timeline full of unknown (null) values and process latest update state.
+                systemStatusUpdate.checks.forEach { (checkId, check) ->
+                    userDefinedChecks.getOrPut(checkId) { emptyTimeline() }
+                        .insertLatestCheck(check)
+                }
+
+                missingInUpdate = userDefinedChecks.keys.toSet() - systemStatusUpdate.checks.keys.toSet()
+
+                // When update does not contain checks that were previously known, set their latest state to unknown (null).
+                missingInUpdate.forEach { checkId ->
+                    userDefinedChecks.getOrPut(checkId) { emptyTimeline() }
+                        .insertLatestCheck(null)
+                }
+            } else {
+                insertLatestAllFailsForExistingChecks()
+                missingInUpdate = emptySet()
             }
 
-            missingInUpdate = userDefinedChecks.keys.toSet() - systemStatusUpdate.checks.keys.toSet()
+            systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
+                allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE, timestamp = clock.now()),
+            )
 
-            // When update does not contain checks that were previously known, set their latest state to unknown (null).
-            missingInUpdate.forEach { checkId ->
-                userDefinedChecks.getOrPut(checkId) { emptyTimeline() }
-                    .insertLatestCheck(null)
-            }
-        } else {
-            insertLatestAllFailsForExistingChecks()
-            missingInUpdate = emptySet()
+            return Snapshot(
+                latest = allChecks.mapValues { (_, timeline) -> timeline.firstOrNull() },
+                absent = missingInUpdate,
+                isCampgroundReachable = isSuccessfulUpdate,
+            )
         }
-
-        systemChecks[ALL_CHECKS_IN_UNKNOWN_STATE_CHECK_ID]?.insertLatestCheck(
-            allChecksInUnknownStateResult(state = if (isSuccessfulUpdate) SUCCESS else FAILURE, timestamp = clock.now()),
-        )
-
-        return Snapshot(
-            latest = allChecks.mapValues { (_, timeline) -> timeline.firstOrNull() },
-            absent = missingInUpdate,
-            isCampgroundReachable = isSuccessfulUpdate,
-        )
     }
 
     private fun insertLatestAllFailsForExistingChecks() =
