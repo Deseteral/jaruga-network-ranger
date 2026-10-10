@@ -33,7 +33,7 @@ class CampgroundClient(
 
     private suspend fun getSystemStatus(): SystemStatus? {
         return runSuspendCatching {
-            httpClient.get("${config.instanceUrl}/system/status")
+            httpClient.get("${config.instanceUrl}/status")
                 .body<SystemStatus>()
         }
             .onErr { ex -> logger.error(ex) { "Error while getting Campground system status." } }

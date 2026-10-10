@@ -7,7 +7,7 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import xyz.deseteral.jaruga.ranger.campground.api.systemStatusEndpoint
+import xyz.deseteral.jaruga.ranger.campground.api.statusEndpoint
 import xyz.deseteral.jaruga.ranger.campground.domain.StatusService
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.DataSourceProvider
 import xyz.deseteral.jaruga.ranger.campground.external.HomeAssistantClient
@@ -35,6 +35,6 @@ fun Application.module() {
     )
 
     routing {
-        systemStatusEndpoint(statusService)
+        statusEndpoint(statusService)
     }
 }
