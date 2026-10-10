@@ -1,5 +1,6 @@
 package xyz.deseteral.jaruga.ranger.campground.domain
 
+import com.github.michaelbull.result.get
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -31,10 +32,14 @@ class StatusService(
             sources.forEach { (name, dataSource) ->
                 when (dataSource) {
                     is CampgroundConfig.DataSource.HomeAssistant ->
-                        hass[name] = async { homeAssistantRepositoryProvider.of(dataSource).getHass() }.await()
+                        hass[name] = async { homeAssistantRepositoryProvider.of(dataSource).getHass() }
+                            .await()
+                            .get()
 
                     is CampgroundConfig.DataSource.TeslaMate ->
-                        teslaMate[name] = async { teslaMateRepositoryProvider.of(dataSource).getState() }.await()
+                        teslaMate[name] = async { teslaMateRepositoryProvider.of(dataSource).getState() }
+                            .await()
+                            .get()
                 }
             }
         }.toDomain()

@@ -1,5 +1,8 @@
 package xyz.deseteral.jaruga.ranger.campground.external
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.coroutines.runSuspendCatching
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.onErr
@@ -16,6 +19,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNamingStrategy
+import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateError
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
 import xyz.deseteral.jaruga.ranger.campground.utils.PeriodicallyComputedValue
 import xyz.deseteral.jaruga.ranger.trail.config.CampgroundConfig
@@ -29,12 +33,14 @@ class TeslaMateClient(
 ) : TeslaMateRepository {
     private val latestVersion = PeriodicallyComputedValue(period = 1.hours) { getLatestVersion() }
 
-    override suspend fun getState(): CampgroundContext.TeslaMate? {
-        val instanceVersion = getInstanceVersion() ?: return null
-        val latestVersion = this.latestVersion.value ?: return null
+    override suspend fun getState(): Result<CampgroundContext.TeslaMate, TeslaMateError> {
+        val instanceVersion = getInstanceVersion() ?: return Err(TeslaMateError.Unavailable)
+        val latestVersion = this.latestVersion.value ?: return Err(TeslaMateError.Unavailable)
 
-        return CampgroundContext.TeslaMate(
-            isUpdateAvailable = instanceVersion != latestVersion,
+        return Ok(
+            CampgroundContext.TeslaMate(
+                isUpdateAvailable = instanceVersion != latestVersion,
+            ),
         )
     }
 
