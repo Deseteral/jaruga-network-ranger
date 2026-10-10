@@ -15,7 +15,7 @@ repositories:
     publish: true
 
 dependencies:
-  - org.jetbrains.kotlin:kotlin-scripting-common:2.4.0
-  - org.jetbrains.kotlin:kotlin-scripting-jvm:2.4.0
-  - org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.4.0
+  - org.jetbrains.kotlin:kotlin-scripting-common:2.4.10
+  - org.jetbrains.kotlin:kotlin-scripting-jvm:2.4.10
+  - org.jetbrains.kotlin:kotlin-scripting-jvm-host:2.4.10
   - org.jetbrains.kotlinx:kotlinx-io-core:0.9.1
