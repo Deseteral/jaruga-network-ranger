@@ -14,6 +14,10 @@ interface DiscordMessage {
   body: unknown;
 }
 
+interface GitHubRelease {
+  name: string;
+}
+
 type LookoutCheckState = "SUCCESS" | "FAILURE";
 
 interface LookoutCheckResult {
@@ -46,6 +50,20 @@ const state: MockState = {
 };
 
 const discordMessages: DiscordMessage[] = [];
+
+async function fetchLatestTeslaMateVersion(): Promise<string> {
+  try {
+    const response = await fetch("https://api.github.com/repos/teslamate-org/teslamate/releases/latest");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const release = (await response.json()) as GitHubRelease;
+    return release.name.replace(/^v/, "");
+  } catch (ex: unknown) {
+    console.error("Could not fetch the latest TeslaMate version from GitHub:", ex);
+    return "unknown";
+  }
+}
+
+const TM_LATEST_VERSION = await fetchLatestTeslaMateVersion();
 
 const UI_HTML = readFileSync(new URL("./mock-server.html", import.meta.url), "utf8");
 
@@ -245,6 +263,7 @@ function renderStateFragment(): string {
   return renderTemplate("state-fragment", {
     entityRows,
     tmVersion: escapeHtml(state.tmVersion),
+    tmLatestVersion: escapeHtml(TM_LATEST_VERSION),
     faultRows,
     discordMessageRows,
     mockStateJson: escapeHtml(JSON.stringify(state, null, 2) ?? ""),
