@@ -206,7 +206,6 @@ async function handleUiLookoutStatus(res: ServerResponse): Promise<void> {
   let degraded = "unknown";
   try {
     const firewatch = await fetchLookoutStatus();
-    console.log("firewatch", firewatch);
     timelineRows = renderTimelineRows(firewatch);
     degraded = firewatch.degraded ? "yes" : "no";
   } catch (ex: unknown) {
