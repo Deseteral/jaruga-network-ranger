@@ -30,7 +30,7 @@ their normal operation.
 
 ### Campground
 
-Campground reads `<data_path>/config.campground.kts`.
+Config location: `<data_path>/config.campground.kts`.
 
 Example:
 
@@ -61,7 +61,7 @@ makes the check fail. The check names must be unique.
 
 ### Lookout
 
-Lookout reads `<data_path>/config.lookout.kts`.
+Config location`<data_path>/config.lookout.kts`.
 
 Example:
 
