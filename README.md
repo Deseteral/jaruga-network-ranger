@@ -86,6 +86,41 @@ LookoutConfig(
 
 ## Development
 
+### Building
+
+This Kotlin project is built with the [Kotlin Toolchain](https://kotlin-toolchain.org/).
+Modules are declared in `project.yaml`, and the `kotlin` wrapper script in the repository root provisions and runs the toolchain.
+For more information refer to Kotlin Toolchain documentation.
+
+### Docker images
+
+Both services ship as a Docker image. 
+Read `campground/Dockerfile` and `lookout/Dockerfile` for more information about images.
+Build them from the repository root:
+
+```sh
+docker build -t jaruga-network-ranger-campground -f campground/Dockerfile .
+docker build -t jaruga-network-ranger-lookout -f lookout/Dockerfile .
+```
+
+Each service expects a data directory mounted at `/app/data` containing its configuration file.
+
+### Versioning
+
+All components - Campground, Lookout and the Trail library - share a single version number and are released together.
+Identical versions are compatible with each other. Version numbers follow [Semantic Versioning](https://semver.org/).
+
+### Releasing
+
+1. Bump `settings.publishing.version` in `trail/module.yaml` and merge the change to `main`.
+2. Create a matching tag and push it.
+
+The "Publish" workflow verifies the tag matches the declared version, then publishes the Docker images
+and the Trail library to GitHub Packages.
+
+Between releases, merges to `main` keep publishing the Docker images with `latest` and `sha-<commit>` tags.
+
+
 ### Mock server
 
 The mock server for local development replaces the need for real data sources.

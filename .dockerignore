@@ -1,0 +1,16 @@
+# Keep the build context small: only the Kotlin Toolchain bootstrap script,
+# the project model and the module sources are needed to build the images.
+*
+!kotlin
+!project.yaml
+!trail
+!lookout
+!campground
+!**/Dockerfile
+
+# Do not ship local development data (contains configuration with secrets)
+**/dev-data
+
+# Ignore build outputs, IDE files and macOS noise inside the modules
+**/build
+**/.DS_Store

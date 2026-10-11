@@ -13,6 +13,13 @@ settings:
 repositories:
   - url: mavenLocal
     publish: true
+  - id: github
+    url: https://maven.pkg.github.com/deseteral/jaruga-network-ranger
+    publish: true
+    credentials:
+      file: creds.properties
+      usernameKey: username
+      passwordKey: password
 
 dependencies:
   - org.jetbrains.kotlin:kotlin-scripting-common:2.4.10
