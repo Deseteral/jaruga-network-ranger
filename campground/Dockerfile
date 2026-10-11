@@ -6,9 +6,10 @@
 # ---------- Stage 1: build the executable jar with the Kotlin Toolchain ----------
 FROM eclipse-temurin:25-jdk-noble AS build
 
-# curl is required by the Kotlin Toolchain bootstrap script
+# curl is required by the Kotlin Toolchain bootstrap script.
+# unzip is required to unpack the runtime dependencies from the executable jar.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
+    && apt-get install -y --no-install-recommends curl unzip \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /project
@@ -17,24 +18,19 @@ WORKDIR /project
 COPY . .
 
 RUN chmod +x kotlin \
-    && ./kotlin task :campground:executableJarJvm
+    && ./kotlin task :campground:executableJarJvm \
+    && mkdir -p /out/lib \
+    && unzip -q -j build/tasks/_campground_executableJarJvm/campground-jvm-executable.jar "BOOT-INF/lib/*" -d /out/lib
 
 # ---------- Stage 2: runtime ----------
-FROM eclipse-temurin:25-jre-noble
-
-# curl powers the healthcheck; unzip replaces the JDK's jar tool
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl unzip \
-    && rm -rf /var/lib/apt/lists/*
+FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 
 # The executable jar packs the application and its dependencies as nested jars.
-# Unpack BOOT-INF/lib so every jar is a real file on disk: the Kotlin scripting
-# host that compiles config.campground.kts at startup cannot read nested entries.
-COPY --from=build /project/build/tasks/_campground_executableJarJvm/campground-jvm-executable.jar /tmp/app.jar
-RUN unzip -q -j /tmp/app.jar "BOOT-INF/lib/*" -d /app/lib \
-    && rm /tmp/app.jar
+# The Kotlin scripting host that compiles user configuration at startup needs
+# them as real files on disk, so BOOT-INF/lib was unpacked in the build stage.
+COPY --from=build /out/lib /app/lib
 
 VOLUME /app/data
 ENV CAMPGROUND_DATA_PATH=/app/data
@@ -42,6 +38,6 @@ ENV CAMPGROUND_DATA_PATH=/app/data
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl --fail --silent "http://localhost:${PORT:-8080}/status" > /dev/null || exit 1
+    CMD wget -q -O /dev/null "http://localhost:${PORT:-8080}/status"
 
 CMD ["java", "-cp", "lib/*", "xyz.deseteral.jaruga.ranger.campground.ApplicationKt"]

@@ -16,6 +16,7 @@ repositories:
   - id: github
     url: https://maven.pkg.github.com/deseteral/jaruga-network-ranger
     publish: true
+    resolve: false
     credentials:
       file: creds.properties
       usernameKey: username
