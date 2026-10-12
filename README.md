@@ -2,6 +2,11 @@
 
 A monitoring system for a homelab.
 
+<p align="center">
+  <img src="resources/campground_logo.svg" alt="Campground logo" height="200" /> <img src="resources/lookout_logo.svg" alt="Lookout logo" height="200" />
+</p>
+
+
 This system consists of two services:
 
 - `Campground` reads data sources and evaluates checks.
