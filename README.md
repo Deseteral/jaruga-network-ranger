@@ -61,7 +61,7 @@ makes the check fail. The check names must be unique.
 
 ### Lookout
 
-Config location`<data_path>/config.lookout.kts`.
+Config location: `<data_path>/config.lookout.kts`.
 
 Example:
 
