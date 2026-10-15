@@ -6,9 +6,11 @@ import com.github.michaelbull.result.onErr
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.engine.ProxyBuilder
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.http.Url
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -42,6 +44,9 @@ class CampgroundClient(
 
     private val httpClient = HttpClient(CIO) {
         expectSuccess = true
+        engine {
+            config.proxyUrl?.let { proxy = ProxyBuilder.http(Url(it)) }
+        }
         install(ContentNegotiation) {
             json(
                 Json {

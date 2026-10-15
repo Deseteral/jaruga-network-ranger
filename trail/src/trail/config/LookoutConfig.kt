@@ -21,6 +21,7 @@ data class LookoutConfig(
     data class Campground(
         val instanceUrl: String,
         val interval: Duration,
+        val proxyUrl: String? = null,
     )
 
     data class Notifier(
