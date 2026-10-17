@@ -66,13 +66,17 @@ class StatusService(
         ctx: CampgroundContext,
         timestamp: Instant,
     ): CheckResult {
+        val isFailure = check.isFailure(ctx)
+            ?: return CheckResult(
+                severity = CheckResult.Severity.MAJOR,
+                state = CheckResult.State.FAILURE,
+                description = "Got no result from evaluating failure query. Is data source reachable?",
+                timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
+            )
+
         return CheckResult(
             severity = check.severity(ctx),
-            state = if (check.isFailure(ctx) ?: true) {
-                CheckResult.State.FAILURE
-            } else {
-                CheckResult.State.SUCCESS
-            },
+            state = if (isFailure) CheckResult.State.FAILURE else CheckResult.State.SUCCESS,
             description = check.description?.let { it(ctx) },
             timestamp = timestamp, // TODO: This should be a timestamp of each check, not the "status timestamp".
         )
