@@ -117,6 +117,9 @@ http-client.private.env.json
 build/
 node_modules/
 
+# Orb portal metadata
+.amp/portals/*
+
 .DS_Store
 
 active-incidents.json

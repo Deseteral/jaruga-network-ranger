@@ -97,6 +97,17 @@ This Kotlin project is built with the [Kotlin Toolchain](https://kotlin-toolchai
 Modules are declared in `project.yaml`, and the `kotlin` wrapper script in the repository root provisions and runs the toolchain.
 For more information refer to Kotlin Toolchain documentation.
 
+### Amp orbs
+
+`.agents/setup` installs the mock server dependencies with Bun (included in the orb image),
+then runs `./kotlin build` and `./kotlin test` to warm the toolchain, JDK, and dependency caches
+before Amp snapshots the orb. Repeated setup runs reuse those caches and incremental build outputs.
+Use the repository's `./kotlin` wrapper; no system Java installation or shell profile changes are needed.
+
+No resume hook is needed: development and tests require no authentication or persistent backing services.
+To run against the local mock server, use the configuration files in `dev-data` by setting
+`CAMPGROUND_DATA_PATH=dev-data` and `LOOKOUT_DATA_PATH=dev-data` for the respective services.
+
 ### Docker images
 
 Both services ship as a Docker image. 

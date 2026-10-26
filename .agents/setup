@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+echo 'Checking Kotlin wrapper prerequisites'
+missing=()
+for package in ca-certificates curl tar unzip; do
+  if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -qx 'install ok installed'; then
+    missing+=("$package")
+  fi
+done
+if ((${#missing[@]})); then
+  sudo apt-get update
+  sudo apt-get install -y --no-install-recommends "${missing[@]}"
+fi
+
+# Bun is included in the orb base image. The Kotlin wrapper provisions its own
+# checksum-verified toolchain and runtime; keep their normal shared caches.
+echo 'Installing mock server dependencies'
+time bun install --cwd mock-server --frozen-lockfile
+
+echo 'Warming Kotlin toolchain, dependencies, and build outputs'
+time ./kotlin build
+
+echo 'Warming test dependencies and verifying the project'
+time ./kotlin test
