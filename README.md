@@ -89,6 +89,9 @@ LookoutConfig(
 )
 ```
 
+Lookout exposes its runtime-generated OpenAPI specification at `GET /openapi.json`.
+It documents `GET /firewatch`, including the response schemas derived from the Kotlin serialization types.
+
 ## Development
 
 ### Building

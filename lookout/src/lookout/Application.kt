@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import xyz.deseteral.jaruga.ranger.lookout.api.firewatchEndpoint
+import xyz.deseteral.jaruga.ranger.lookout.api.openApiEndpoint
 import xyz.deseteral.jaruga.ranger.lookout.domain.IncidentService
 import xyz.deseteral.jaruga.ranger.lookout.domain.NotificationService
 import xyz.deseteral.jaruga.ranger.lookout.domain.ProbeService
@@ -57,5 +58,6 @@ fun Application.module() {
 
     routing {
         firewatchEndpoint(timelineService, probeService, incidentService)
+        openApiEndpoint()
     }
 }
