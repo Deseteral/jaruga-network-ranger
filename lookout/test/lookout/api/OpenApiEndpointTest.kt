@@ -1,6 +1,7 @@
 package xyz.deseteral.jaruga.ranger.lookout.api
 
 import com.github.michaelbull.result.Ok
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
@@ -28,7 +29,12 @@ import xyz.deseteral.jaruga.ranger.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.ranger.trail.config.LookoutConfig
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.Incident
+import kotlin.io.path.Path
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.time.Clock
+
+private val prettyJson = Json { prettyPrint = true }
 
 class OpenApiEndpointTest : FunSpec({
     test("the specification documents firewatch and its response schemas without documenting itself") {
@@ -104,6 +110,16 @@ class OpenApiEndpointTest : FunSpec({
             val status = Json.parseToJsonElement(firewatch.bodyAsText()).jsonObject
             status.keys shouldBe properties.keys
             status.getValue("lastSuccessfulProbeAt").jsonPrimitive.content shouldBe "null"
+
+            val specFile = Path("openapi.json")
+            val generated = prettyJson.encodeToString(spec) + "\n"
+            if (java.lang.Boolean.getBoolean("lookout.openapi.update")) {
+                specFile.writeText(generated)
+                println("Updated ${specFile.toAbsolutePath()}")
+            }
+            withClue("OpenAPI specification is stale. Regenerate it using the command in README.md.") {
+                specFile.readText() shouldBe generated
+            }
         }
     }
 })

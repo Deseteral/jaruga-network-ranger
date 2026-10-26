@@ -1,0 +1,175 @@
+{
+    "openapi": "3.1.1",
+    "info": {
+        "title": "Lookout API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/firewatch": {
+            "get": {
+                "summary": "Get the current monitoring status",
+                "description": "Returns the last successful probe time, check timelines (newest first), and active incidents. Null timeline entries represent unknown check states. The system is degraded when any incident is active.",
+                "responses": {
+                    "200": {
+                        "description": "Current monitoring status",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FirewatchResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CheckResult": {
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "title": "CheckResult",
+                "required": [
+                    "state",
+                    "severity",
+                    "timestamp"
+                ],
+                "properties": {
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "state": {
+                        "type": "string",
+                        "enum": [
+                            "SUCCESS",
+                            "FAILURE"
+                        ]
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": [
+                            "MAJOR",
+                            "MINOR"
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Incident.HistoryEntry": {
+                "type": "object",
+                "title": "Incident.HistoryEntry",
+                "required": [
+                    "timestamp",
+                    "state"
+                ],
+                "properties": {
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "state": {
+                        "type": "string",
+                        "enum": [
+                            "SUCCESS",
+                            "FAILURE"
+                        ]
+                    }
+                }
+            },
+            "Incident": {
+                "type": "object",
+                "title": "Incident",
+                "required": [
+                    "checkId",
+                    "triggeredOn",
+                    "severity",
+                    "history"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "checkId": {
+                        "type": "string"
+                    },
+                    "triggeredOn": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "resolvedOn": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "severity": {
+                        "type": "string",
+                        "enum": [
+                            "MAJOR",
+                            "MINOR"
+                        ]
+                    },
+                    "description": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Incident.HistoryEntry"
+                        }
+                    }
+                }
+            },
+            "FirewatchResponse": {
+                "type": "object",
+                "title": "FirewatchResponse",
+                "required": [
+                    "checks",
+                    "activeIncidents",
+                    "degraded"
+                ],
+                "properties": {
+                    "lastSuccessfulProbeAt": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "checks": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/CheckResult"
+                            }
+                        }
+                    },
+                    "activeIncidents": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/Incident"
+                        }
+                    },
+                    "degraded": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    }
+}
