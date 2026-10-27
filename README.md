@@ -89,6 +89,8 @@ LookoutConfig(
 )
 ```
 
+Lookout exposes its runtime-generated OpenAPI specification at `GET /openapi.json`.
+
 ## Development
 
 ### Building
