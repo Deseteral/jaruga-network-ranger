@@ -90,7 +90,6 @@ LookoutConfig(
 ```
 
 Lookout exposes its runtime-generated OpenAPI specification at `GET /openapi.json`.
-It documents `GET /firewatch`, including the response schemas derived from the Kotlin serialization types.
 
 ## Development
 
@@ -99,19 +98,6 @@ It documents `GET /firewatch`, including the response schemas derived from the K
 This Kotlin project is built with the [Kotlin Toolchain](https://kotlin-toolchain.org/).
 Modules are declared in `project.yaml`, and the `kotlin` wrapper script in the repository root provisions and runs the toolchain.
 For more information refer to Kotlin Toolchain documentation.
-
-### OpenAPI specification
-
-The generated specification is committed at `lookout/openapi.json` so API changes can be reviewed in Git.
-After changing Lookout's routes or response types, regenerate it from the repository root:
-
-```sh
-./kotlin test -m lookout --jvm-args=-Dlookout.openapi.update=true
-```
-
-Generation uses Ktor's in-process test application and does not start a listening server, load service configuration,
-or contact Campground. Normal `./kotlin test` runs (including CI) check that the committed file is up to date without
-rewriting it. The runtime `GET /openapi.json` endpoint remains available.
 
 ### Amp orbs
 

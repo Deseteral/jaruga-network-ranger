@@ -29,6 +29,5 @@ dependencies:
   - com.michael-bull.kotlin-retry:kotlin-retry-result:2.0.2
 
 test-dependencies:
-  - $ktor.server.testHost
   - io.kotest:kotest-runner-junit5:6.2.5
   - io.kotest:kotest-assertions-core:6.2.5
