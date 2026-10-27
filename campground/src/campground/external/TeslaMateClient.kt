@@ -70,24 +70,24 @@ class TeslaMateClient(
             .get()
     }
 
-    private val httpRawTextClient = HttpClient(CIO) {
-        expectSuccess = true
-    }
-
-    private val githubApiClient = HttpClient(CIO) {
-        expectSuccess = true
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                    namingStrategy = JsonNamingStrategy.SnakeCase
-                },
-            )
-        }
-    }
-
     companion object {
         private val VERSION_FROM_HTML_REGEX = """>Version</th><td>(\d+\.\d+\.\d+)<""".toRegex()
+
+        private val httpRawTextClient = HttpClient(CIO) {
+            expectSuccess = true
+        }
+
+        private val githubApiClient = HttpClient(CIO) {
+            expectSuccess = true
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        namingStrategy = JsonNamingStrategy.SnakeCase
+                    },
+                )
+            }
+        }
     }
 }
 

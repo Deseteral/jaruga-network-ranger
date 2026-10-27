@@ -34,18 +34,6 @@ class HomeAssistantClient(
         return Ok(CampgroundContext.Hass(states.map { it.toDomain() }))
     }
 
-    private val httpClient = HttpClient(CIO) {
-        expectSuccess = true
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    ignoreUnknownKeys = true
-                    namingStrategy = JsonNamingStrategy.SnakeCase
-                },
-            )
-        }
-    }
-
     private suspend fun getAllStates(): List<HomeAssistantState>? {
         return runSuspendCatching {
             httpClient
@@ -66,5 +54,19 @@ class HomeAssistantClient(
         val state: String,
     ) {
         fun toDomain() = CampgroundContext.Hass.EntityState(entityId, state)
+    }
+
+    companion object {
+        private val httpClient = HttpClient(CIO) {
+            expectSuccess = true
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        namingStrategy = JsonNamingStrategy.SnakeCase
+                    },
+                )
+            }
+        }
     }
 }
