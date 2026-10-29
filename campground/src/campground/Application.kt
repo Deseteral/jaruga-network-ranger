@@ -1,9 +1,12 @@
 package xyz.deseteral.jaruga.ranger.campground
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -35,6 +38,9 @@ fun Application.module() {
     )
 
     routing {
+        get("/health") {
+            call.respond(HttpStatusCode.OK)
+        }
         statusEndpoint(statusService)
     }
 }

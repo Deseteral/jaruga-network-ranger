@@ -38,6 +38,6 @@ ENV CAMPGROUND_DATA_PATH=/app/data
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD wget -q -O /dev/null "http://localhost:${PORT:-8080}/status"
+    CMD wget -q -O /dev/null "http://localhost:${PORT:-8080}/health"
 
 CMD ["java", "-cp", "lib/*", "xyz.deseteral.jaruga.ranger.campground.ApplicationKt"]
