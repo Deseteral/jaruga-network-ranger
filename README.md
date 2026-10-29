@@ -64,6 +64,11 @@ CampgroundConfig(
 A check reads its source data from the context, for example `ctx.hass["ha"]`. An `isFailure` result of `true` or `null`
 makes the check fail. The check names must be unique.
 
+Sources are read sequentially. The optional `sourceTimeout` field on `CampgroundConfig` limits each
+source read separately (default: `10.seconds`). A timed-out source has a
+`null` context value, and collection continues with the next source. There is no overall collection
+deadline.
+
 ### Lookout
 
 Config location: `<data_path>/config.lookout.kts`.

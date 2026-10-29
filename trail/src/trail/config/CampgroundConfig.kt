@@ -3,12 +3,19 @@ package xyz.deseteral.jaruga.ranger.trail.config
 import xyz.deseteral.jaruga.ranger.trail.domain.CampgroundContext
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemChecks.RESERVED_CHECK_NAMES
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 data class CampgroundConfig(
     val sources: Map<String, DataSource>,
     val checks: List<CheckDefinition>,
+    val sourceTimeout: Duration = 10.seconds,
 ) {
     init {
+        require(sourceTimeout.isFinite() && sourceTimeout > Duration.ZERO) {
+            "Source timeout must be finite and positive."
+        }
+
         val duplicatedNames = checks
             .groupingBy { it.name }
             .eachCount()

@@ -32,6 +32,7 @@ fun Application.module() {
         sources = config.sources,
         checks = config.checks,
         clock = Clock.System,
+        sourceTimeout = config.sourceTimeout,
     )
 
     routing {

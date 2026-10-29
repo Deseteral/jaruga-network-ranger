@@ -2,8 +2,8 @@ package xyz.deseteral.jaruga.ranger.campground.domain
 
 import com.github.michaelbull.result.get
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeoutOrNull
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.DataSourceProvider
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.HomeAssistantRepository
 import xyz.deseteral.jaruga.ranger.campground.domain.datasources.TeslaMateRepository
@@ -13,6 +13,7 @@ import xyz.deseteral.jaruga.ranger.trail.domain.CheckId
 import xyz.deseteral.jaruga.ranger.trail.domain.CheckResult
 import xyz.deseteral.jaruga.ranger.trail.domain.SystemStatus
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Instant
 
 private val logger = KotlinLogging.logger {}
@@ -23,6 +24,7 @@ class StatusService(
     private val sources: Map<String, CampgroundConfig.DataSource>,
     private val checks: List<CampgroundConfig.CheckDefinition>,
     private val clock: Clock,
+    private val sourceTimeout: Duration,
 ) {
     suspend fun getStatus(): SystemStatus = coroutineScope {
         val timestamp = clock.now()
@@ -32,14 +34,14 @@ class StatusService(
             sources.forEach { (name, dataSource) ->
                 when (dataSource) {
                     is CampgroundConfig.DataSource.HomeAssistant ->
-                        hass[name] = async { homeAssistantRepositoryProvider.of(dataSource).getHass() }
-                            .await()
-                            .get()
+                        hass[name] = withTimeoutOrNull(sourceTimeout) {
+                            homeAssistantRepositoryProvider.of(dataSource).getHass()
+                        }?.get()
 
                     is CampgroundConfig.DataSource.TeslaMate ->
-                        teslaMate[name] = async { teslaMateRepositoryProvider.of(dataSource).getState() }
-                            .await()
-                            .get()
+                        teslaMate[name] = withTimeoutOrNull(sourceTimeout) {
+                            teslaMateRepositoryProvider.of(dataSource).getState()
+                        }?.get()
                 }
             }
         }.toDomain()
