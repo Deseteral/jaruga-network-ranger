@@ -447,6 +447,12 @@ private class Fixture(
         incidentService = IncidentService(
             notificationService = NotificationService(
                 discordRepository = discord,
+                telegramRepository = object : TelegramRepository {
+                    override suspend fun notify(
+                        incident: Incident,
+                        channel: LookoutConfig.NotificationChannel.Telegram,
+                    ): Result<Unit, TelegramError> = error("Unexpected Telegram notification")
+                },
                 config = LookoutConfig.Notifier(
                     process = { LookoutConfig.NotificationChannel.DiscordWebhook(WEBHOOK_URL) },
                     retryPolicy = LookoutConfig.Notifier.RetryPolicy(maxAttempts = maxAttempts),
