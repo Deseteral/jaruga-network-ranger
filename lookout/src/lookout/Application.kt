@@ -17,6 +17,7 @@ import xyz.deseteral.jaruga.ranger.lookout.domain.TimelineService
 import xyz.deseteral.jaruga.ranger.lookout.external.CampgroundClient
 import xyz.deseteral.jaruga.ranger.lookout.external.DiscordClient
 import xyz.deseteral.jaruga.ranger.lookout.external.FilePersistentCache
+import xyz.deseteral.jaruga.ranger.lookout.external.TelegramClient
 import xyz.deseteral.jaruga.ranger.trail.loader.loadLookoutConfig
 import kotlin.time.Clock
 
@@ -34,7 +35,8 @@ fun Application.module() {
     val campgroundClient = CampgroundClient(config.campground)
     val timelineService = TimelineService(config.bufferSize, Clock.System)
     val discordClient = DiscordClient()
-    val notificationService = NotificationService(discordClient, config.notifier)
+    val telegramClient = TelegramClient()
+    val notificationService = NotificationService(discordClient, telegramClient, config.notifier)
     val incidentService = IncidentService(
         notificationService = notificationService,
         activeIncidentsCache = FilePersistentCache.json(

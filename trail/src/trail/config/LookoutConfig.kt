@@ -34,6 +34,16 @@ data class LookoutConfig(
     }
 
     sealed class NotificationChannel {
+        data class Telegram(
+            val botToken: String,
+            val chatId: String,
+        ) : NotificationChannel() {
+            init {
+                require(botToken.isNotBlank()) { "Telegram bot token must not be blank." }
+                require(chatId.isNotBlank()) { "Telegram chat ID must not be blank." }
+            }
+        }
+
         data class DiscordWebhook(
             val url: String,
         ) : NotificationChannel() {

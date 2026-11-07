@@ -10,17 +10,23 @@ import xyz.deseteral.jaruga.ranger.trail.domain.Incident
 
 class NotificationService(
     private val discordRepository: DiscordRepository,
+    private val telegramRepository: TelegramRepository,
     private val config: LookoutConfig.Notifier,
 ) {
     private val retryPolicy =
-        binaryExponentialBackoff<DiscordError>(min = 100, max = 10_000) +
+        binaryExponentialBackoff<NotificationError>(min = 100, max = 10_000) +
             stopAtAttempts(config.retryPolicy.maxAttempts)
 
-    suspend fun sendNotification(incident: Incident): Result<Unit, DiscordError> {
+    suspend fun sendNotification(incident: Incident): Result<Unit, NotificationError> {
         return when (val notification = config.process(incident)) {
             is LookoutConfig.NotificationChannel.DiscordWebhook ->
                 retry(retryPolicy) {
                     discordRepository.notifyViaWebhook(incident, notification)
+                }
+
+            is LookoutConfig.NotificationChannel.Telegram ->
+                retry(retryPolicy) {
+                    telegramRepository.notify(incident, notification)
                 }
         }
     }

@@ -11,6 +11,6 @@ interface DiscordRepository {
     ): Result<Unit, DiscordError>
 }
 
-sealed interface DiscordError {
+sealed interface DiscordError : NotificationError {
     data object WebhookFailed : DiscordError
 }
